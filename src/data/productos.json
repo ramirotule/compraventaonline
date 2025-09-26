@@ -1,0 +1,84 @@
+[
+  {
+    "id": 1,
+    "titulo": "iPhone 13 Pro Max",
+    "descripcion": "256GB, color grafito, excelente estado con caja original",
+    "precio": 950000,
+    "moneda": "ARS",
+    "categoria": "Electrónica",
+    "ubicacion": "Santa Rosa, La Pampa",
+    "imagenes": [
+      "/assets/productos/iphone 13.jpg"
+    ],
+    "vendedor": {
+      "nombre": "Carlos Gómez",
+      "rating": 4.8
+    }
+  },
+  {
+    "id": 2,
+    "titulo": "Bicicleta MTB Venzo",
+    "descripcion": "Rodado 29, cuadro de aluminio, frenos a disco hidráulicos",
+    "precio": 210000,
+    "moneda": "ARS",
+    "categoria": "Deportes",
+    "ubicacion": "Córdoba Capital",
+    "imagenes": [
+      "/assets/productos/bicicleta_venzo.jpg",
+      "/assets/productos/venzo2.png"
+
+    ],
+    "vendedor": {
+      "nombre": "Lucía Fernández",
+      "rating": 4.5
+    }
+  },
+  {
+    "id": 3,
+    "titulo": "Sillón 3 cuerpos",
+    "descripcion": "Sillón de tela color gris, poco uso, muy cómodo",
+    "precio": 120000,
+    "moneda": "ARS",
+    "categoria": "Hogar",
+    "ubicacion": "Rosario, Santa Fe",
+    "imagenes": [
+      "/assets/productos/sillon.jpg"
+    ],
+    "vendedor": {
+      "nombre": "Martín Pereyra",
+      "rating": 4.2
+    }
+  },
+  {
+    "id": 4,
+    "titulo": "Volkswagen Gol Trend 2018",
+    "descripcion": "1.6L, 75.000km, único dueño, VTV vigente",
+    "precio": 5300000,
+    "moneda": "ARS",
+    "categoria": "Vehículos",
+    "ubicacion": "Buenos Aires",
+    "imagenes": [
+      "/assets/productos/goltrend.jpeg"
+    ],
+    "vendedor": {
+      "nombre": "AutoCity",
+      "rating": 4.9
+    }
+  },
+  {
+    "id": 5,
+    "titulo": "Zapatillas Nike Air Max",
+    "descripcion": "Talle 42, color blanco con negro, nuevas en caja",
+    "precio": 85000,
+    "moneda": "ARS",
+    "categoria": "Moda",
+    "ubicacion": "Mendoza Capital",
+    "imagenes": [
+      "/assets/productos/zapatillas.jpg"
+    ],
+    "vendedor": {
+      "nombre": "Sofía Díaz",
+      "rating": 4.7
+    }
+  }
+]
