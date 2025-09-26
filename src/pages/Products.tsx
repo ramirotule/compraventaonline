@@ -180,16 +180,14 @@ const Products = () => {
                   alt={producto.titulo}
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
-                {/* Badge de categoría */}
-                <span className="absolute top-2 left-2 bg-amber-400 text-white text-xs px-2 py-1 rounded">
-                  {producto.categoria}
-                </span>
+             
               </div>
               
               <div className="p-4">
-                <h2 className="text-lg font-semibold mb-2 line-clamp-2">
-                  {producto.titulo}
-                </h2>
+                <Link to={`/productos/${producto.id}`}>
+                  <h2 className="text-lg font-semibold mb-2 line-clamp-2">{producto.titulo}</h2>
+                </Link>
+              
                 <p className="text-gray-600 text-sm mb-3 line-clamp-2">
                   {producto.descripcion}
                 </p>

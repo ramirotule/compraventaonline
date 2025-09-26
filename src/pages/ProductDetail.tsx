@@ -1,54 +1,41 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
 import productos from '../data/productos.json';
 import UniversalModal from '../components/Modal/UniversalModal';
-import UniversalSnackbar, { type SnackbarType } from '../components/Snackbar/UniversalSnackbar';
+import UniversalSnackbar from '../components/Snackbar/UniversalSnackbar';
+
+// Importar stores de Zustand
+import { useAuthStore } from '../stores/authStore';
+import { useFavoritesStore } from '../stores/favoritesStore';
+import { useUIStore } from '../stores/uiStore';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [selectedImage, setSelectedImage] = useState(0);
-  const [isFavorite, setIsFavorite] = useState(false);
   
-  // Obtener contexto de autenticación
-  const auth = useContext(AuthContext);
-  const user = auth?.user;
-  const profile = auth?.profile;
-  
-  // Estado unificado para snackbars
-  const [snackbarState, setSnackbarState] = useState<{
-    isOpen: boolean;
-    type: SnackbarType;
-    customMessage?: string;
-    customSubtitle?: string;
-  }>({
-    isOpen: false,
-    type: 'success'
-  });
-  
-  // Estado unificado para modales
-  const [modalState, setModalState] = useState<{
-    type: 'contact' | 'report' | 'auth' | null;
-    isOpen: boolean;
-    authAction?: 'contact' | 'report';
-  }>({
-    type: null,
-    isOpen: false
-  });
-  
+  // Zustand stores
+  const { user, profile } = useAuthStore();
+  const { 
+    isFavorite, 
+    toggleFavorite 
+  } = useFavoritesStore();
+  const {
+    snackbar,
+    modal,
+    showSnackbar,
+    hideSnackbar,
+    showModal,
+    hideModal
+  } = useUIStore();
+
   // Verificar si el usuario está autenticado
   const isAuthenticated = !!user;
 
   // Buscar el producto por ID
   const producto = productos.find(p => p.id === Number(id));
-
-  // Cargar estado de favoritos al montar el componente
-  useEffect(() => {
-    if (producto) {
-      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-      setIsFavorite(favorites.includes(producto.id));
-    }
-  }, [producto]);
+  
+  // Verificar si es favorito
+  const isProductFavorite = isFavorite(Number(id));
 
   // Si no se encuentra el producto, redirigir a productos
   if (!producto) {
@@ -64,53 +51,34 @@ const ProductDetail = () => {
 
   const handleContactSeller = () => {
     if (!isAuthenticated) {
-      setModalState({
-        type: 'auth',
-        isOpen: true,
-        authAction: 'contact'
+      showModal('auth', {
+        authAction: 'contact',
+        productTitle: producto.titulo,
+        vendorName: producto.vendedor.nombre
       });
       return;
     }
-    setModalState({
-      type: 'contact',
-      isOpen: true
+    showModal('contact', {
+      productTitle: producto.titulo,
+      vendorName: producto.vendedor.nombre
     });
   };
 
-  const handleToggleFavorite = () => {
+  const handleToggleFavorite = async () => {
     // Si no está autenticado, redirigir a login
     if (!isAuthenticated) {
       window.location.href = '/login';
       return;
     }
 
-    // TODO: Implementar favoritos con Supabase cuando esté disponible
-    // Por ahora seguimos usando localStorage como fallback
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    const productId = producto.id;
+    // Toggle favorito usando el store
+    await toggleFavorite(producto.id);
     
-    if (isFavorite) {
-      // Remover de favoritos
-      const newFavorites = favorites.filter((id: number) => id !== productId);
-      localStorage.setItem('favorites', JSON.stringify(newFavorites));
-      setIsFavorite(false);
-      
-      // Mostrar snackbar de eliminado
-      setSnackbarState({
-        isOpen: true,
-        type: 'favorite-removed'
-      });
+    // Mostrar snackbar apropiado
+    if (isProductFavorite) {
+      showSnackbar('favorite-removed');
     } else {
-      // Agregar a favoritos
-      const newFavorites = [...favorites, productId];
-      localStorage.setItem('favorites', JSON.stringify(newFavorites));
-      setIsFavorite(true);
-      
-      // Mostrar snackbar de agregado
-      setSnackbarState({
-        isOpen: true,
-        type: 'favorite-added'
-      });
+      showSnackbar('favorite-added');
     }
   };
 
@@ -123,16 +91,16 @@ const ProductDetail = () => {
 
   const handleReport = () => {
     if (!isAuthenticated) {
-      setModalState({
-        type: 'auth',
-        isOpen: true,
-        authAction: 'report'
+      showModal('auth', {
+        authAction: 'report',
+        productTitle: producto.titulo,
+        vendorName: producto.vendedor.nombre
       });
       return;
     }
-    setModalState({
-      type: 'report',
-      isOpen: true
+    showModal('report', {
+      productTitle: producto.titulo,
+      vendorName: producto.vendedor.nombre
     });
   };
 
@@ -146,14 +114,8 @@ const ProductDetail = () => {
       timestamp: new Date().toISOString()
     });
     
-    // Mostrar snackbar de éxito
-    setSnackbarState({
-      isOpen: true,
-      type: 'success',
-      customMessage: '¡Reporte enviado exitosamente!',
-      customSubtitle: 'Nuestro equipo revisará el contenido dentro de 24 horas'
-    });
-    setModalState({ type: null, isOpen: false });
+    hideModal();
+    showSnackbar('success', '¡Reporte enviado exitosamente!', 'Nuestro equipo revisará el contenido dentro de 24 horas');
   };
 
   const generateWhatsAppMessage = () => {
@@ -163,12 +125,12 @@ const ProductDetail = () => {
 
   // Función para cerrar modal
   const handleModalClose = () => {
-    setModalState({ type: null, isOpen: false });
+    hideModal();
   };
 
   // Función para cerrar snackbar
   const handleSnackbarClose = () => {
-    setSnackbarState(prev => ({ ...prev, isOpen: false }));
+    hideSnackbar();
   };
 
   return (
@@ -331,17 +293,17 @@ const ProductDetail = () => {
               <button 
                 onClick={handleToggleFavorite}
                 className={`border py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 ${
-                  isFavorite 
-                    ? 'border-red-400 text-red-600 bg-red-50 hover:bg-red-100' 
+                  isProductFavorite 
+                    ? 'border-green-400 text-green-600 bg-green-50 hover:bg-green-100' 
                     : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
-                title={!isAuthenticated ? 'Inicia sesión para agregar a favoritos' : (isFavorite ? 'Remover de favoritos' : 'Agregar a favoritos')}
+                title={!isAuthenticated ? 'Inicia sesión para agregar a favoritos' : (isProductFavorite ? 'Remover de favoritos' : 'Agregar a favoritos')}
               >
-                <svg className="w-5 h-5" fill={isFavorite ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill={isProductFavorite ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
                 <span>
-                  {!isAuthenticated ? 'Favorito' : (isFavorite ? 'En Favoritos' : 'Favorito')}
+                  {!isAuthenticated ? 'Favorito' : (isProductFavorite ? 'En Favoritos' : 'Favorito')}
                 </span>
               </button>
               
@@ -384,23 +346,23 @@ const ProductDetail = () => {
       </div>
 
       <UniversalModal
-        isOpen={modalState.isOpen}
+        isOpen={modal.isOpen}
         onClose={handleModalClose}
-        type={modalState.type || 'contact'}
+        type={modal.type || 'contact'}
         productTitle={producto.titulo}
         vendorName={producto.vendedor.nombre}
-        authAction={modalState.authAction}
+        authAction={modal.authAction}
         onReportSubmit={handleReportSubmit}
         whatsappUrl={generateWhatsAppMessage()}
       />
 
       {/* Snackbar Universal */}
       <UniversalSnackbar
-        isOpen={snackbarState.isOpen}
+        isOpen={snackbar.isOpen}
         onClose={handleSnackbarClose}
-        type={snackbarState.type}
-        customMessage={snackbarState.customMessage}
-        customSubtitle={snackbarState.customSubtitle}
+        type={snackbar.type}
+        customMessage={snackbar.customMessage}
+        customSubtitle={snackbar.customSubtitle}
       />
     </div>
   );

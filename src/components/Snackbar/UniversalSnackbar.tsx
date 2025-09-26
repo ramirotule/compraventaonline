@@ -1,6 +1,14 @@
 import React from 'react';
 
-export type SnackbarType = 'success' | 'favorite-added' | 'favorite-removed' | 'error' | 'warning' | 'info';
+export type SnackbarType = 
+  | 'success' 
+  | 'error' 
+  | 'warning' 
+  | 'info'
+  | 'favorite-added'
+  | 'favorite-removed'
+  | 'product-shared'
+  | 'report-sent';
 
 interface UniversalSnackbarProps {
   isOpen: boolean;
@@ -19,7 +27,7 @@ const UniversalSnackbar: React.FC<UniversalSnackbarProps> = ({
   customMessage,
   customSubtitle,
   autoClose = true,
-  autoCloseDelay = 4000
+  autoCloseDelay = 1500
 }) => {
   // Auto-close functionality
   React.useEffect(() => {

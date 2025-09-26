@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { useStoresInitialization } from "./hooks/useStoresInitialization";
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -11,6 +12,9 @@ import Favoritos from "./pages/Favoritos";
 import TerminosYCondiciones from "./pages/TerminosYCondiciones";
 
 const App = () => {
+  // Inicializar stores con Supabase
+  useStoresInitialization();
+
   return (
     <AuthProvider>
       <div className="min-h-screen bg-gray-50">

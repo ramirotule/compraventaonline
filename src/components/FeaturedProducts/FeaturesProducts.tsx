@@ -11,24 +11,29 @@ const FeaturesProducts = () => {
           {productos.slice(0, 3).map((producto) => (
             <div key={producto.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
               {/* Imagen del producto */}
-              <div className="relative h-32 overflow-hidden">
+                <div className="relative h-32 flex items-center justify-center overflow-hidden">
                 <img
+                  width={200}
+                  height={200}
                   src={producto.imagenes[0]}
                   alt={producto.titulo}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  className="object-center hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute top-2 right-2">
                   <span className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
-                    ⭐ DESTACADO
+                  ⭐ DESTACADO
                   </span>
                 </div>
-              </div>
+                </div>
               
               {/* Contenido del producto */}
               <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">{producto.titulo}</h3>
+                <Link to={`/productos/${producto.id}`} className="text-xl font-semibold mb-2">
+                  {producto.titulo}
+                </Link>
+
                 <p className="text-gray-600 mb-3 text-sm">{producto.descripcion.substring(0, 100)}...</p>
-                
+
                 <div className="text-2xl font-bold text-amber-400 mb-2">
                   {formatearPrecio(producto.precio)}
                 </div>

@@ -8,7 +8,7 @@
     "categoria": "Electrónica",
     "ubicacion": "Santa Rosa, La Pampa",
     "imagenes": [
-      "/assets/productos/iphone 13.jpg"
+      "/assets/productos/iphone13.jpg"
     ],
     "vendedor": {
       "nombre": "Carlos Gómez",
@@ -79,6 +79,246 @@
     "vendedor": {
       "nombre": "Sofía Díaz",
       "rating": 4.7
+    }
+  },
+  {
+    "id": 6,
+    "titulo": "MacBook Air M1",
+    "descripcion": "13 pulgadas, 512GB SSD, 16GB RAM, color gris espacial",
+    "precio": 1150000,
+    "moneda": "ARS",
+    "categoria": "Electrónica",
+    "ubicacion": "Mar del Plata, Buenos Aires",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "TechStore",
+      "rating": 4.9
+    }
+  },
+  {
+    "id": 7,
+    "titulo": "Mesa de Comedor",
+    "descripcion": "Mesa de madera maciza para 6 personas, diseño moderno",
+    "precio": 180000,
+    "moneda": "ARS",
+    "categoria": "Hogar",
+    "ubicacion": "La Plata, Buenos Aires",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "Muebles del Sur",
+      "rating": 4.3
+    }
+  },
+  {
+    "id": 8,
+    "titulo": "PlayStation 5",
+    "descripcion": "Consola nueva en caja, incluye 2 joysticks y juego Spider-Man",
+    "precio": 780000,
+    "moneda": "ARS",
+    "categoria": "Electrónica",
+    "ubicacion": "Tucumán Capital",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "Gaming Zone",
+      "rating": 4.8
+    }
+  },
+  {
+    "id": 9,
+    "titulo": "Guitarra Criolla Yamaha",
+    "descripcion": "C40, cuerdas de nylon, ideal para principiantes, con funda",
+    "precio": 95000,
+    "moneda": "ARS",
+    "categoria": "Música",
+    "ubicacion": "Salta Capital",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "Música & Arte",
+      "rating": 4.6
+    }
+  },
+  {
+    "id": 10,
+    "titulo": "Campera de Cuero",
+    "descripcion": "Talle M, cuero genuino color negro, estilo motoquero",
+    "precio": 120000,
+    "moneda": "ARS",
+    "categoria": "Moda",
+    "ubicacion": "Bariloche, Río Negro",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "Leather Style",
+      "rating": 4.5
+    }
+  },
+  {
+    "id": 11,
+    "titulo": "Cinta de Correr",
+    "descripcion": "Eléctrica plegable, velocidad hasta 16km/h, pantalla LCD",
+    "precio": 450000,
+    "moneda": "ARS",
+    "categoria": "Deportes",
+    "ubicacion": "Neuquén Capital",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "Fitness Pro",
+      "rating": 4.4
+    }
+  },
+  {
+    "id": 12,
+    "titulo": "Tablet Samsung Galaxy Tab",
+    "descripcion": "10.1 pulgadas, 64GB, WiFi + 4G, incluye S Pen",
+    "precio": 280000,
+    "moneda": "ARS",
+    "categoria": "Electrónica",
+    "ubicacion": "Rosario, Santa Fe",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "ElectroMax",
+      "rating": 4.7
+    }
+  },
+  {
+    "id": 13,
+    "titulo": "Juego de Sábanas",
+    "descripcion": "100% algodón, 2 plazas, color beige, incluye fundas",
+    "precio": 35000,
+    "moneda": "ARS",
+    "categoria": "Hogar",
+    "ubicacion": "San Juan Capital",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "Textil Confort",
+      "rating": 4.2
+    }
+  },
+  {
+    "id": 14,
+    "titulo": "Reloj Smartwatch",
+    "descripcion": "Pantalla AMOLED, GPS, monitor cardíaco, resistente al agua",
+    "precio": 65000,
+    "moneda": "ARS",
+    "categoria": "Electrónica",
+    "ubicacion": "Posadas, Misiones",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "WearTech",
+      "rating": 4.6
+    }
+  },
+  {
+    "id": 15,
+    "titulo": "Mochila de Trekking",
+    "descripcion": "60L, impermeable, múltiples compartimientos, ideal montañismo",
+    "precio": 42000,
+    "moneda": "ARS",
+    "categoria": "Deportes",
+    "ubicacion": "Ushuaia, Tierra del Fuego",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "Aventura Total",
+      "rating": 4.8
+    }
+  },
+  {
+    "id": 16,
+    "titulo": "Auriculares Bluetooth",
+    "descripcion": "Cancelación de ruido activa, 30h autonomía, estuche de carga",
+    "precio": 85000,
+    "moneda": "ARS",
+    "categoria": "Electrónica",
+    "ubicacion": "Córdoba Capital",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "AudioPro",
+      "rating": 4.7
+    }
+  },
+  {
+    "id": 17,
+    "titulo": "Vestido de Fiesta",
+    "descripcion": "Talle 38, color azul marino, largo midi, perfecto estado",
+    "precio": 55000,
+    "moneda": "ARS",
+    "categoria": "Moda",
+    "ubicacion": "Villa Carlos Paz, Córdoba",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "Elegance Boutique",
+      "rating": 4.5
+    }
+  },
+  {
+    "id": 18,
+    "titulo": "Cafetera Express",
+    "descripcion": "15 bares de presión, molinillo integrado, depósito 1.8L",
+    "precio": 320000,
+    "moneda": "ARS",
+    "categoria": "Hogar",
+    "ubicacion": "Bariloche, Río Negro",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1497636577773-f1231844b336?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "Coffee World",
+      "rating": 4.6
+    }
+  },
+  {
+    "id": 19,
+    "titulo": "Bicicleta Eléctrica",
+    "descripcion": "Motor 350W, autonomía 50km, rodado 26, plegable",
+    "precio": 580000,
+    "moneda": "ARS",
+    "categoria": "Vehículos",
+    "ubicacion": "Buenos Aires Capital",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "EcoBikes",
+      "rating": 4.8
+    }
+  },
+  {
+    "id": 20,
+    "titulo": "Piano Digital",
+    "descripcion": "88 teclas pesadas, 128 sonidos, pedales incluidos",
+    "precio": 420000,
+    "moneda": "ARS",
+    "categoria": "Música",
+    "ubicacion": "Resistencia, Chaco",
+    "imagenes": [
+      "https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=500&h=400&fit=crop&crop=center"
+    ],
+    "vendedor": {
+      "nombre": "Instrumentos Musicales",
+      "rating": 4.9
     }
   }
 ]
