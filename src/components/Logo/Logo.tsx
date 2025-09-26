@@ -8,7 +8,6 @@ interface LogoProps {
 
 const Logo: React.FC<LogoProps> = ({ 
   size = 'md', 
-  showText = true, 
   className = '' 
 }) => {
   const sizeClasses = {
@@ -18,12 +17,6 @@ const Logo: React.FC<LogoProps> = ({
     xl: 'h-35 w-auto'
   };
 
-  const textSizes = {
-    sm: 'text-lg',
-    md: 'text-xl',
-    lg: 'text-2xl', 
-    xl: 'text-3xl'
-  };
 
   return (
     <div className={`flex items-center space-x-2 ${className}`}>
