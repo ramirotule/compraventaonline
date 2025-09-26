@@ -4,50 +4,28 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import { es } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../styles/datepicker.css';
+import { getProvincias, getCiudadesByProvincia, type Ciudad } from '../data/argentinaData';
 import { 
   sendEmailVerification, 
   sendSMSVerification, 
   verifyCode, 
   resendCode 
 } from '../services/verificationService';
+import { 
+  validateRegistrationForm, 
+  clearFieldError, 
+  hasValidationErrors,
+  type FormData as RegistrationFormData,
+  type ValidationErrors as RegistrationValidationErrors
+} from '../utils/validations';
 
 // Register Spanish locale
 registerLocale('es', es);
 
-interface FormData {
-  // Datos personales
-  nombre: string;
-  apellido: string;
-  dni: string;
-  fechaNacimiento: Date | null;
-  
-  // Contacto
-  email: string;
-  telefono: string;
-  
-  // Dirección
-  direccion: string;
-  ciudad: string;
-  provincia: string;
-  codigoPostal: string;
-  
-  // Credenciales
-  password: string;
-  confirmPassword: string;
-  
-  // Aceptación de términos
-  aceptaTerminos: boolean;
-  aceptaPrivacidad: boolean;
-}
-
-interface ValidationErrors {
-  [key: string]: string;
-}
-
 type VerificationMethod = 'email' | 'sms' | null;
 
 const Register = () => {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<RegistrationFormData>({
     nombre: '',
     apellido: '',
     dni: '',
@@ -64,7 +42,7 @@ const Register = () => {
     aceptaPrivacidad: false
   });
 
-  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [errors, setErrors] = useState<RegistrationValidationErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showVerificationStep, setShowVerificationStep] = useState(false);
   const [verificationMethod, setVerificationMethod] = useState<VerificationMethod>(null);
@@ -72,102 +50,17 @@ const Register = () => {
   const [codeError, setCodeError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // Lista de provincias argentinas
-  const provincias = [
-    'Buenos Aires', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba', 'Corrientes',
-    'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja', 'Mendoza',
-    'Misiones', 'Neuquén', 'Río Negro', 'Salta', 'San Juan', 'San Luis',
-    'Santa Cruz', 'Santa Fe', 'Santiago del Estero', 'Tierra del Fuego',
-    'Tucumán', 'CABA'
-  ];
+  // Estados para la ubicación
+  const [ciudadesDisponibles, setCiudadesDisponibles] = useState<Ciudad[]>([]);
+  
+  // Obtener listas de provincias
+  const provincias = getProvincias();
 
   // Validaciones
   const validateForm = (): boolean => {
-    const newErrors: ValidationErrors = {};
-
-    // Nombre y apellido
-    if (!formData.nombre.trim()) newErrors.nombre = 'El nombre es obligatorio';
-    else if (formData.nombre.trim().length < 2) newErrors.nombre = 'El nombre debe tener al menos 2 caracteres';
-    
-    if (!formData.apellido.trim()) newErrors.apellido = 'El apellido es obligatorio';
-    else if (formData.apellido.trim().length < 2) newErrors.apellido = 'El apellido debe tener al menos 2 caracteres';
-
-    // DNI
-    if (!formData.dni.trim()) newErrors.dni = 'El DNI es obligatorio';
-    else if (!/^\d{7,8}$/.test(formData.dni.replace(/\./g, ''))) {
-      newErrors.dni = 'El DNI debe tener entre 7 y 8 dígitos';
-    }
-
-    // Fecha de nacimiento
-    if (!formData.fechaNacimiento) {
-      newErrors.fechaNacimiento = 'La fecha de nacimiento es obligatoria';
-    } else {
-      const fechaNac = formData.fechaNacimiento;
-      const hoy = new Date();
-      const edad = hoy.getFullYear() - fechaNac.getFullYear();
-      const mesActual = hoy.getMonth();
-      const diaActual = hoy.getDate();
-      const mesNacimiento = fechaNac.getMonth();
-      const diaNacimiento = fechaNac.getDate();
-      
-      // Ajustar edad si aún no ha pasado el cumpleaños este año
-      let edadFinal = edad;
-      if (mesActual < mesNacimiento || (mesActual === mesNacimiento && diaActual < diaNacimiento)) {
-        edadFinal--;
-      }
-      
-      if (edadFinal < 18) {
-        newErrors.fechaNacimiento = 'Debes ser mayor de 18 años para registrarte';
-      }
-    }
-
-    // Email
-    if (!formData.email.trim()) {
-      newErrors.email = 'El email es obligatorio';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'El formato del email no es válido';
-    }
-
-    // Teléfono
-    if (!formData.telefono.trim()) {
-      newErrors.telefono = 'El teléfono es obligatorio';
-    } else if (!/^(\+54)?[\s-]?(\d{2,4})[\s-]?\d{6,8}$/.test(formData.telefono.replace(/[\s-]/g, ''))) {
-      newErrors.telefono = 'El formato del teléfono no es válido (ej: +54 11 1234-5678)';
-    }
-
-    // Dirección
-    if (!formData.direccion.trim()) newErrors.direccion = 'La dirección es obligatoria';
-    if (!formData.ciudad.trim()) newErrors.ciudad = 'La ciudad es obligatoria';
-    if (!formData.provincia) newErrors.provincia = 'La provincia es obligatoria';
-    if (!formData.codigoPostal.trim()) {
-      newErrors.codigoPostal = 'El código postal es obligatorio';
-    } else if (!/^\d{4}$/.test(formData.codigoPostal)) {
-      newErrors.codigoPostal = 'El código postal debe tener 4 dígitos';
-    }
-
-    // Contraseña
-    if (!formData.password) {
-      newErrors.password = 'La contraseña es obligatoria';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = 'La contraseña debe contener al menos una mayúscula, una minúscula y un número';
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Las contraseñas no coinciden';
-    }
-
-    // Términos y condiciones
-    if (!formData.aceptaTerminos) {
-      newErrors.aceptaTerminos = 'Debes aceptar los términos y condiciones';
-    }
-    if (!formData.aceptaPrivacidad) {
-      newErrors.aceptaPrivacidad = 'Debes aceptar la política de privacidad';
-    }
-
+    const newErrors = validateRegistrationForm(formData);
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return !hasValidationErrors(newErrors);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -177,12 +70,56 @@ const Register = () => {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData(prev => ({ ...prev, [name]: checked }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      // Lógica especial para provincia
+      if (name === 'provincia') {
+        const provinciaId = parseInt(value);
+        if (provinciaId) {
+          const ciudades = getCiudadesByProvincia(provinciaId);
+          setCiudadesDisponibles(ciudades);
+          // Resetear ciudad y código postal cuando cambia la provincia
+          setFormData(prev => ({
+            ...prev,
+            provincia: value,
+            ciudad: '',
+            codigoPostal: ''
+          }));
+        } else {
+          setCiudadesDisponibles([]);
+          setFormData(prev => ({
+            ...prev,
+            provincia: '',
+            ciudad: '',
+            codigoPostal: ''
+          }));
+        }
+      }
+      // Lógica especial para ciudad
+      else if (name === 'ciudad') {
+        const ciudadId = parseInt(value);
+        if (ciudadId) {
+          const ciudad = ciudadesDisponibles.find(c => c.id === ciudadId);
+          // Si la ciudad tiene código postal cargado, usarlo; sino dejar vacío
+          const codigoPostalAutomatico = ciudad?.codigoPostal || '';
+          setFormData(prev => ({
+            ...prev,
+            ciudad: value,
+            codigoPostal: codigoPostalAutomatico
+          }));
+        } else {
+          setFormData(prev => ({
+            ...prev,
+            ciudad: '',
+            codigoPostal: ''
+          }));
+        }
+      } else {
+        setFormData(prev => ({ ...prev, [name]: value }));
+      }
     }
 
     // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors(prev => clearFieldError(prev, name));
     }
   };
 
@@ -191,8 +128,21 @@ const Register = () => {
     
     // Limpiar error del campo cuando el usuario seleccione una fecha
     if (errors.fechaNacimiento) {
-      setErrors(prev => ({ ...prev, fechaNacimiento: '' }));
+      setErrors(prev => clearFieldError(prev, 'fechaNacimiento'));
     }
+  };
+
+  // Función para obtener la ubicación completa
+  const getUbicacionCompleta = () => {
+    if (!formData.provincia || !formData.ciudad) return '';
+    
+    const provincia = provincias.find(p => p.id === parseInt(formData.provincia));
+    const ciudad = ciudadesDisponibles.find(c => c.id === parseInt(formData.ciudad));
+    
+    if (provincia && ciudad) {
+      return `${ciudad.nombre}, ${provincia.nombre}`;
+    }
+    return '';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -399,7 +349,7 @@ const Register = () => {
                   maxLength={6}
                 />
                 {codeError && (
-                  <p className="mt-1 text-sm text-red-600">{codeError}</p>
+                  <p className="mt-1 text-sm text-red-600 font-bold">{codeError}</p>
                 )}
               </div>
 
@@ -488,7 +438,7 @@ const Register = () => {
                   placeholder="Tu nombre"
                 />
                 {errors.nombre && (
-                  <p className="mt-1 text-sm text-red-600">{errors.nombre}</p>
+                  <p className="mt-1 text-sm text-red-600 font-bold">{errors.nombre}</p>
                 )}
               </div>
 
@@ -506,7 +456,7 @@ const Register = () => {
                   placeholder="Tu apellido"
                 />
                 {errors.apellido && (
-                  <p className="mt-1 text-sm text-red-600">{errors.apellido}</p>
+                  <p className="mt-1 text-sm text-red-600 font-bold">{errors.apellido}</p>
                 )}
               </div>
 
@@ -524,7 +474,7 @@ const Register = () => {
                   placeholder="12.345.678"
                 />
                 {errors.dni && (
-                  <p className="mt-1 text-sm text-red-600">{errors.dni}</p>
+                  <p className="mt-1 text-sm text-red-600 font-bold">{errors.dni}</p>
                 )}
               </div>
 
@@ -548,7 +498,7 @@ const Register = () => {
                   locale="es"
                 />
                 {errors.fechaNacimiento && (
-                  <p className="mt-1 text-sm text-red-600">{errors.fechaNacimiento}</p>
+                  <p className="mt-1 text-sm text-red-600 font-bold">{errors.fechaNacimiento}</p>
                 )}
               </div>
             </div>
@@ -575,7 +525,7 @@ const Register = () => {
                   placeholder="tu@email.com"
                 />
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                  <p className="mt-1 text-sm text-red-600 font-bold">{errors.email}</p>
                 )}
               </div>
 
@@ -593,7 +543,7 @@ const Register = () => {
                   placeholder="+54 11 1234-5678"
                 />
                 {errors.telefono && (
-                  <p className="mt-1 text-sm text-red-600">{errors.telefono}</p>
+                  <p className="mt-1 text-sm text-red-600 font-bold">{errors.telefono}</p>
                 )}
               </div>
             </div>
@@ -620,28 +570,12 @@ const Register = () => {
                   placeholder="Av. Corrientes 1234"
                 />
                 {errors.direccion && (
-                  <p className="mt-1 text-sm text-red-600">{errors.direccion}</p>
+                  <p className="mt-1 text-sm text-red-600 font-bold">{errors.direccion}</p>
                 )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label htmlFor="ciudad" className="block text-sm font-medium text-gray-700 mb-1">
-                    Ciudad *
-                  </label>
-                  <input
-                    type="text"
-                    id="ciudad"
-                    name="ciudad"
-                    value={formData.ciudad}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
-                    placeholder="Buenos Aires"
-                  />
-                  {errors.ciudad && (
-                    <p className="mt-1 text-sm text-red-600">{errors.ciudad}</p>
-                  )}
-                </div>
+          
 
                 <div>
                   <label htmlFor="provincia" className="block text-sm font-medium text-gray-700 mb-1">
@@ -654,13 +588,39 @@ const Register = () => {
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
                   >
-                    <option value="">Seleccionar</option>
+                    <option value="">Seleccionar provincia</option>
                     {provincias.map(provincia => (
-                      <option key={provincia} value={provincia}>{provincia}</option>
+                      <option key={provincia.id} value={provincia.id}>{provincia.nombre}</option>
                     ))}
                   </select>
                   {errors.provincia && (
-                    <p className="mt-1 text-sm text-red-600">{errors.provincia}</p>
+                    <p className="mt-1 text-sm text-red-600 font-bold">{errors.provincia}</p>
+                  )}
+                </div>
+
+                      <div>
+                  <label htmlFor="ciudad" className="block text-sm font-medium text-gray-700 mb-1">
+                    Ciudad *
+                  </label>
+                  <select
+                    id="ciudad"
+                    name="ciudad"
+                    value={formData.ciudad}
+                    onChange={handleInputChange}
+                    disabled={!formData.provincia}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  >
+                    <option value="">
+                      {!formData.provincia ? "Primero selecciona una provincia" : "Selecciona una ciudad"}
+                    </option>
+                    {ciudadesDisponibles.map((ciudad) => (
+                      <option key={ciudad.id} value={ciudad.id}>
+                        {ciudad.nombre}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.ciudad && (
+                    <p className="mt-1 text-sm text-red-600 font-bold">{errors.ciudad}</p>
                   )}
                 </div>
 
@@ -678,10 +638,18 @@ const Register = () => {
                     placeholder="1234"
                   />
                   {errors.codigoPostal && (
-                    <p className="mt-1 text-sm text-red-600">{errors.codigoPostal}</p>
+                    <p className="mt-1 text-sm text-red-600 font-bold">{errors.codigoPostal}</p>
                   )}
                 </div>
               </div>
+
+              {/* Mostrar ubicación seleccionada */}
+              {getUbicacionCompleta() && (
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-600 mb-1">📍 Ubicación seleccionada:</p>
+                  <p className="font-medium text-blue-800">{getUbicacionCompleta()}</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -706,7 +674,7 @@ const Register = () => {
                   placeholder="Mínimo 8 caracteres"
                 />
                 {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                  <p className="mt-1 text-sm text-red-600 font-bold">{errors.password}</p>
                 )}
               </div>
 
@@ -724,7 +692,7 @@ const Register = () => {
                   placeholder="Repite la contraseña"
                 />
                 {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+                  <p className="mt-1 text-sm text-red-600 font-bold">{errors.confirmPassword}</p>
                 )}
               </div>
             </div>
@@ -755,7 +723,7 @@ const Register = () => {
                 </label>
               </div>
               {errors.aceptaTerminos && (
-                <p className="text-sm text-red-600 ml-6">{errors.aceptaTerminos}</p>
+                <p className="text-sm text-red-600 font-bold ml-6">{errors.aceptaTerminos}</p>
               )}
 
               <div className="flex items-start">
@@ -776,7 +744,7 @@ const Register = () => {
                 </label>
               </div>
               {errors.aceptaPrivacidad && (
-                <p className="text-sm text-red-600 ml-6">{errors.aceptaPrivacidad}</p>
+                <p className="text-sm text-red-600 font-bold ml-6">{errors.aceptaPrivacidad}</p>
               )}
             </div>
           </div>

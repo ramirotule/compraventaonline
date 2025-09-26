@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useContentValidation } from '../hooks/useContentValidation';
 import ValidationWarningModal from '../components/Modal/ValidationWarningModal';
+import { getProvincias, getCiudadesByProvincia, type Ciudad } from '../data/argentinaData';
 
 const Vender = () => {
   // Hook de validación de contenido
@@ -26,9 +27,35 @@ const Vender = () => {
     precio: '',
     categoria: '',
     estado: '',
-    ubicacion: '',
+    provincia: '',
+    ciudad: '',
+    codigoPostal: '',
+    ubicacion: '', // Mantenemos para compatibilidad, se llenará automáticamente
     fotos: [] as File[]
   });
+
+  // Estados para la ubicación
+  const [ciudadesDisponibles, setCiudadesDisponibles] = useState<Ciudad[]>([]);
+  
+  // Obtener listas de provincias
+  const provincias = getProvincias();
+
+  // Función helper para generar ubicación completa
+  const generarUbicacionCompleta = (ciudadId: string, provinciaId: string, codigoPostal: string) => {
+    if (!ciudadId || !provinciaId) return '';
+    
+    const ciudad = ciudadesDisponibles.find(c => c.id === parseInt(ciudadId));
+    const provincia = provincias.find(p => p.id === parseInt(provinciaId));
+    
+    if (ciudad && provincia) {
+      let ubicacion = `${ciudad.nombre}, ${provincia.nombre}`;
+      if (codigoPostal.trim()) {
+        ubicacion += ` (CP: ${codigoPostal})`;
+      }
+      return ubicacion;
+    }
+    return '';
+  };
 
   // Estado para validaciones en tiempo real
   const [fieldValidations, setFieldValidations] = useState<{
@@ -68,6 +95,74 @@ const Vender = () => {
       ...prev,
       [name]: value
     }));
+    
+    // Lógica especial para provincia
+    if (name === 'provincia') {
+      const provinciaId = parseInt(value);
+      if (provinciaId) {
+        const ciudades = getCiudadesByProvincia(provinciaId);
+        setCiudadesDisponibles(ciudades);
+        // Resetear ciudad y código postal cuando cambia la provincia
+        setProducto(prev => ({
+          ...prev,
+          provincia: value,
+          ciudad: '',
+          codigoPostal: '',
+          ubicacion: ''
+        }));
+      } else {
+        setCiudadesDisponibles([]);
+        setProducto(prev => ({
+          ...prev,
+          provincia: '',
+          ciudad: '',
+          codigoPostal: '',
+          ubicacion: ''
+        }));
+      }
+      return;
+    }
+    
+    // Lógica especial para ciudad
+    if (name === 'ciudad') {
+      const ciudadId = parseInt(value);
+      if (ciudadId) {
+        const ciudad = ciudadesDisponibles.find(c => c.id === ciudadId);
+        const provincia = provincias.find(p => p.id === parseInt(producto.provincia));
+        
+        if (ciudad && provincia) {
+          // Si la ciudad tiene código postal cargado, usarlo; sino dejar vacío
+          const codigoPostalAutomatico = ciudad.codigoPostal || '';
+          const ubicacionCompleta = generarUbicacionCompleta(value, producto.provincia, codigoPostalAutomatico);
+          
+          setProducto(prev => ({
+            ...prev,
+            ciudad: value,
+            codigoPostal: codigoPostalAutomatico,
+            ubicacion: ubicacionCompleta
+          }));
+        }
+      } else {
+        setProducto(prev => ({
+          ...prev,
+          ciudad: '',
+          codigoPostal: '',
+          ubicacion: ''
+        }));
+      }
+      return;
+    }
+
+    // Lógica especial para código postal
+    if (name === 'codigoPostal') {
+      const ubicacionCompleta = generarUbicacionCompleta(producto.ciudad, producto.provincia, value);
+      setProducto(prev => ({
+        ...prev,
+        codigoPostal: value,
+        ubicacion: ubicacionCompleta
+      }));
+      return;
+    }
     
     // Validar texto en tiempo real para título y descripción
     if (name === 'titulo' || name === 'descripcion') {
@@ -167,10 +262,14 @@ const Vender = () => {
       precio: '',
       categoria: '',
       estado: '',
+      provincia: '',
+      ciudad: '',
+      codigoPostal: '',
       ubicacion: '',
       fotos: []
     });
     
+    setCiudadesDisponibles([]);
     setValidationErrors([]);
     setValidationWarnings([]);
     setShowValidationResults(false);
@@ -477,20 +576,97 @@ const Vender = () => {
             </div>
 
             <div>
-              <label htmlFor="ubicacion" className="block text-sm font-medium text-gray-700 mb-2">
-                Ubicación *
+              <label htmlFor="provincia" className="block text-sm font-medium text-gray-700 mb-2">
+                Provincia *
               </label>
-              <input
-                type="text"
-                id="ubicacion"
-                name="ubicacion"
-                value={producto.ubicacion}
+              <select
+                id="provincia"
+                name="provincia"
+                value={producto.provincia}
                 onChange={handleInputChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
-                placeholder="Ciudad, Provincia"
-              />
+              >
+                <option value="">Selecciona una provincia</option>
+                {provincias.map((provincia) => (
+                  <option key={provincia.id} value={provincia.id}>
+                    {provincia.nombre}
+                  </option>
+                ))}
+              </select>
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="ciudad" className="block text-sm font-medium text-gray-700 mb-2">
+                Ciudad *
+              </label>
+              <select
+                id="ciudad"
+                name="ciudad"
+                value={producto.ciudad}
+                onChange={handleInputChange}
+                required
+                disabled={!producto.provincia}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+              >
+                <option value="">
+                  {!producto.provincia ? "Primero selecciona una provincia" : "Selecciona una ciudad"}
+                </option>
+                {ciudadesDisponibles.map((ciudad) => (
+                  <option key={ciudad.id} value={ciudad.id}>
+                    {ciudad.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="codigoPostal" className="block text-sm font-medium text-gray-700 mb-2">
+                Código Postal
+              </label>
+              <input
+                type="text"
+                id="codigoPostal"
+                name="codigoPostal"
+                value={producto.codigoPostal}
+                onChange={handleInputChange}
+                disabled={!producto.ciudad}
+                placeholder="Ej: 1000"
+                pattern="[0-9]{4,8}"
+                title="Ingresa un código postal válido (4 a 8 dígitos)"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {!producto.ciudad ? "Selecciona una ciudad primero" : "Ingresa el código postal de la zona"}
+              </p>
+            </div>
+          </div>
+
+          {/* Ubicación completa (solo lectura) */}
+          {producto.ubicacion && (
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <div className="flex items-start space-x-3">
+                <div className="bg-amber-100 rounded-full p-2 flex-shrink-0">
+                  <svg className="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900 mb-1">📍 Ubicación del producto:</p>
+                  <p className="text-lg font-semibold text-gray-800">{producto.ubicacion}</p>
+                  {producto.codigoPostal && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      Esta información aparecerá en tu publicación para que los compradores sepan la ubicación exacta.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div>
           </div>
 
           {/* Fotos */}
