@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { supabase } from '../lib/supabase';
+// import { supabase } from '../lib/supabase'; // TODO: Usar cuando implementemos sincronización con Supabase
 
 interface FavoritesState {
   // Estado

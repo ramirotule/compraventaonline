@@ -12,7 +12,7 @@ export interface ProductData {
   provincia: string;
   ciudad: string;
   codigo_postal: string;
-  ubicacion: string;
+  contacto: string;
   user_id?: string;
   imagenes?: string[];
   activo?: boolean;
@@ -321,9 +321,9 @@ export const getUserFavorites = async (): Promise<{ data: ProductData[]; error: 
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
-    const productos = data?.map(item => item.productos).filter(Boolean) || [];
+    const productos = (data?.map(item => item.productos).filter(Boolean) || []) as unknown as ProductData[];
     
-    return { data: productos as ProductData[], error };
+    return { data: productos, error };
   } catch (error) {
     console.error('Error fetching favorites:', error);
     return { data: [], error };
@@ -341,7 +341,7 @@ export const isProductFavorite = async (productId: string): Promise<{ isFavorite
       return { isFavorite: false, error: null };
     }
 
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('favoritos')
       .select('id')
       .eq('user_id', user.id)
@@ -349,7 +349,7 @@ export const isProductFavorite = async (productId: string): Promise<{ isFavorite
       .single();
 
     return { isFavorite: !!data, error: null };
-  } catch (error) {
+  } catch {
     return { isFavorite: false, error: null };
   }
 };
