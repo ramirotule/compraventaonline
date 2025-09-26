@@ -66,12 +66,12 @@ export const sendEmailVerification = async (data: VerificationData): Promise<{ s
     console.error('Error enviando email:', error);
     
     // En modo desarrollo, mostrar el código en consola
-    if (process.env.NODE_ENV === 'development' && data.email) {
-      const storedData = verificationCodes.get(data.email);
-      if (storedData) {
-        console.log(`🔐 CÓDIGO DE DESARROLLO para ${data.email}: ${storedData.code}`);
-      }
-    }
+    // if (process.env.NODE_ENV === 'development' && data.email) {
+    //   const storedData = verificationCodes.get(data.email);
+    //   if (storedData) {
+    //     console.log(`🔐 CÓDIGO DE DESARROLLO para ${data.email}: ${storedData.code}`);
+    //   }
+    // }
     
     return {
       success: false,
