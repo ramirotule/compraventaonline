@@ -2,12 +2,23 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import productos from '../data/productos.json';
 import UniversalModal from '../components/Modal/UniversalModal';
+import UniversalSnackbar, { type SnackbarType } from '../components/Snackbar/UniversalSnackbar';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [selectedImage, setSelectedImage] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
+  
+  // Estado unificado para snackbars
+  const [snackbarState, setSnackbarState] = useState<{
+    isOpen: boolean;
+    type: SnackbarType;
+    customMessage?: string;
+    customSubtitle?: string;
+  }>({
+    isOpen: false,
+    type: 'success'
+  });
   
   // Estado unificado para modales
   const [modalState, setModalState] = useState<{
@@ -70,13 +81,23 @@ const ProductDetail = () => {
       const newFavorites = favorites.filter((id: number) => id !== productId);
       localStorage.setItem('favorites', JSON.stringify(newFavorites));
       setIsFavorite(false);
-      alert('Producto eliminado de favoritos');
+      
+      // Mostrar snackbar de eliminado
+      setSnackbarState({
+        isOpen: true,
+        type: 'favorite-removed'
+      });
     } else {
       // Agregar a favoritos
       const newFavorites = [...favorites, productId];
       localStorage.setItem('favorites', JSON.stringify(newFavorites));
       setIsFavorite(true);
-      alert('Producto agregado a favoritos');
+      
+      // Mostrar snackbar de agregado
+      setSnackbarState({
+        isOpen: true,
+        type: 'favorite-added'
+      });
     }
   };
 
@@ -113,13 +134,13 @@ const ProductDetail = () => {
     });
     
     // Mostrar snackbar de éxito
-    setShowSuccessSnackbar(true);
+    setSnackbarState({
+      isOpen: true,
+      type: 'success',
+      customMessage: '¡Reporte enviado exitosamente!',
+      customSubtitle: 'Nuestro equipo revisará el contenido dentro de 24 horas'
+    });
     setModalState({ type: null, isOpen: false });
-    
-    // Ocultar snackbar después de 4 segundos
-    setTimeout(() => {
-      setShowSuccessSnackbar(false);
-    }, 4000);
   };
 
   const generateWhatsAppMessage = () => {
@@ -146,6 +167,11 @@ const ProductDetail = () => {
   // Función para cerrar modal
   const handleModalClose = () => {
     setModalState({ type: null, isOpen: false });
+  };
+
+  // Función para cerrar snackbar
+  const handleSnackbarClose = () => {
+    setSnackbarState(prev => ({ ...prev, isOpen: false }));
   };
 
   return (
@@ -362,7 +388,6 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* Modal Universal */}
       <UniversalModal
         isOpen={modalState.isOpen}
         onClose={handleModalClose}
@@ -375,30 +400,14 @@ const ProductDetail = () => {
         whatsappUrl={generateWhatsAppMessage()}
       />
 
-      {/* Snackbar de Éxito */}
-      {showSuccessSnackbar && (
-        <div className="fixed inset-0 flex items-center justify-center z-[60] pointer-events-none">
-          <div className="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-3 max-w-md border-l-4 border-green-400 pointer-events-auto transition-all duration-300 ease-in-out">
-            <div className="bg-green-400 rounded-full p-1 flex-shrink-0">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <p className="font-semibold text-lg">¡Reporte enviado exitosamente!</p>
-              <p className="text-sm text-green-100 mt-1">Nuestro equipo revisará el contenido dentro de 24 horas</p>
-            </div>
-            <button
-              onClick={() => setShowSuccessSnackbar(false)}
-              className="text-green-200 hover:text-white transition-colors p-1 hover:bg-green-600 rounded"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Snackbar Universal */}
+      <UniversalSnackbar
+        isOpen={snackbarState.isOpen}
+        onClose={handleSnackbarClose}
+        type={snackbarState.type}
+        customMessage={snackbarState.customMessage}
+        customSubtitle={snackbarState.customSubtitle}
+      />
     </div>
   );
 };
