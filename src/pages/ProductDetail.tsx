@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import productos from '../data/productos.json';
 import UniversalModal from '../components/Modal/UniversalModal';
 import UniversalSnackbar, { type SnackbarType } from '../components/Snackbar/UniversalSnackbar';
@@ -8,6 +9,11 @@ const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [selectedImage, setSelectedImage] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
+  
+  // Obtener contexto de autenticación
+  const auth = useContext(AuthContext);
+  const user = auth?.user;
+  const profile = auth?.profile;
   
   // Estado unificado para snackbars
   const [snackbarState, setSnackbarState] = useState<{
@@ -30,9 +36,8 @@ const ProductDetail = () => {
     isOpen: false
   });
   
-  // Simular estado de autenticación (false = no logueado, true = logueado)
-  // En una aplicación real esto vendría del contexto de autenticación
-  const [estaLogueado, setEstaLogueado] = useState(false);
+  // Verificar si el usuario está autenticado
+  const isAuthenticated = !!user;
 
   // Buscar el producto por ID
   const producto = productos.find(p => p.id === Number(id));
@@ -58,7 +63,7 @@ const ProductDetail = () => {
   };
 
   const handleContactSeller = () => {
-    if (!estaLogueado) {
+    if (!isAuthenticated) {
       setModalState({
         type: 'auth',
         isOpen: true,
@@ -73,6 +78,14 @@ const ProductDetail = () => {
   };
 
   const handleToggleFavorite = () => {
+    // Si no está autenticado, redirigir a login
+    if (!isAuthenticated) {
+      window.location.href = '/login';
+      return;
+    }
+
+    // TODO: Implementar favoritos con Supabase cuando esté disponible
+    // Por ahora seguimos usando localStorage como fallback
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
     const productId = producto.id;
     
@@ -109,7 +122,7 @@ const ProductDetail = () => {
   };
 
   const handleReport = () => {
-    if (!estaLogueado) {
+    if (!isAuthenticated) {
       setModalState({
         type: 'auth',
         isOpen: true,
@@ -148,22 +161,6 @@ const ProductDetail = () => {
     return `https://wa.me/5491123456789?text=${encodeURIComponent(message)}`;
   };
 
-  // Función para simular login (solo para desarrollo)
-  const handleLogin = () => {
-    setEstaLogueado(true);
-    const currentAuthAction = modalState.authAction;
-    setModalState({ type: null, isOpen: false });
-    
-    // Ejecutar la acción que el usuario quería hacer
-    setTimeout(() => {
-      if (currentAuthAction === 'contact') {
-        setModalState({ type: 'contact', isOpen: true });
-      } else if (currentAuthAction === 'report') {
-        setModalState({ type: 'report', isOpen: true });
-      }
-    }, 100);
-  };
-
   // Función para cerrar modal
   const handleModalClose = () => {
     setModalState({ type: null, isOpen: false });
@@ -195,24 +192,19 @@ const ProductDetail = () => {
         </ol>
       </nav>
 
-      {/* Botón de simulación de autenticación (solo para desarrollo) */}
-      <div className="mb-4 p-3 bg-gray-100 rounded-lg border">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">
-            🧪 <strong>Modo de pruebas:</strong> Estado actual - {estaLogueado ? '✅ Logueado' : '❌ No logueado'}
-          </span>
-          <button
-            onClick={() => setEstaLogueado(!estaLogueado)}
-            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-              estaLogueado 
-                ? 'bg-red-100 text-red-700 hover:bg-red-200' 
-                : 'bg-green-100 text-green-700 hover:bg-green-200'
-            }`}
-          >
-            {estaLogueado ? 'Simular Logout' : 'Simular Login'}
-          </button>
+      {/* Estado de autenticación - Solo visible si está autenticado */}
+      {isAuthenticated && profile && (
+        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+          <div className="flex items-center space-x-2 text-green-700">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <span className="text-sm">
+              Conectado como <strong>{profile.nombre || user?.email}</strong>
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Sección de Imágenes */}
@@ -343,11 +335,14 @@ const ProductDetail = () => {
                     ? 'border-red-400 text-red-600 bg-red-50 hover:bg-red-100' 
                     : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
+                title={!isAuthenticated ? 'Inicia sesión para agregar a favoritos' : (isFavorite ? 'Remover de favoritos' : 'Agregar a favoritos')}
               >
                 <svg className="w-5 h-5" fill={isFavorite ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
-                <span>{isFavorite ? 'En Favoritos' : 'Favorito'}</span>
+                <span>
+                  {!isAuthenticated ? 'Favorito' : (isFavorite ? 'En Favoritos' : 'Favorito')}
+                </span>
               </button>
               
               <button 
@@ -396,7 +391,6 @@ const ProductDetail = () => {
         vendorName={producto.vendedor.nombre}
         authAction={modalState.authAction}
         onReportSubmit={handleReportSubmit}
-        onLogin={handleLogin}
         whatsappUrl={generateWhatsAppMessage()}
       />
 

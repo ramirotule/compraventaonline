@@ -10,7 +10,6 @@ interface UniversalModalProps {
   vendorName?: string;
   authAction?: 'contact' | 'report';
   onReportSubmit?: (reason: string, details: string) => void;
-  onLogin?: () => void;
   whatsappUrl?: string;
 }
 
@@ -22,7 +21,6 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
   vendorName,
   authAction,
   onReportSubmit,
-  onLogin,
   whatsappUrl
 }) => {
   const [selectedReason, setSelectedReason] = useState('');
@@ -232,18 +230,9 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
           Ya tengo cuenta - Iniciar Sesión
         </Link>
 
-        <div className="pt-4 border-t">
-          <button
-            onClick={onLogin}
-            className="w-full text-sm bg-green-100 px-4 py-2 rounded text-green-700 hover:bg-green-200 transition-colors"
-          >
-            🧪 Simular Login (Solo para pruebas)
-          </button>
-        </div>
-
         <button
           onClick={onClose}
-          className="w-full text-gray-500 hover:text-gray-700 py-2 text-sm"
+          className="w-full text-gray-500 hover:text-gray-700 py-2 text-sm mt-4"
         >
           Cancelar
         </button>

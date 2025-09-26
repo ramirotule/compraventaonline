@@ -98,9 +98,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Función para cerrar sesión
   const signOut = async () => {
     try {
+      // Cerrar sesión en Supabase
       const { error } = await supabase.auth.signOut();
+      
+      if (!error) {
+        // Limpiar el estado local
+        setUser(null);
+        setProfile(null);
+        setSession(null);
+        console.log('Sesión cerrada exitosamente en Supabase');
+      }
+      
       return { error };
     } catch (error) {
+      console.error('Error al cerrar sesión:', error);
       return { error };
     }
   };
@@ -180,7 +191,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signIn,
     signOut,
     updateProfile,
-  };
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

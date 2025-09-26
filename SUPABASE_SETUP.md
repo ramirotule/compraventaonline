@@ -7,7 +7,7 @@
 1. Ve a [supabase.com](https://supabase.com) y crea una cuenta
 2. Haz clic en "New Project"
 3. Completa los datos:
-   - **Name**: `compraventa-online`
+   - **Name**: `compraventaonline`
    - **Database Password**: Elige una contraseña segura
    - **Region**: Selecciona la región más cercana a ti
    - **Pricing Plan**: Free (para empezar)
