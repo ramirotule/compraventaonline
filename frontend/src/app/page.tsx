@@ -135,7 +135,7 @@ export default async function HomePage() {
             🌾 El Primer Marketplace 100% Pampeano
           </span>
 
-          <h1 className="font-heading text-4xl font-extrabold tracking-tight sm:text-6xl text-white max-w-3xl mx-auto leading-[1.1]">
+          <h1 className="font-heading text-4xl font-extrabold tracking-tight sm:text-6xl text-foreground max-w-3xl mx-auto leading-[1.1]">
             Encontrá lo que buscas en <span className="bg-gradient-to-r from-accent-gold to-accent-green bg-clip-text text-transparent">La Pampa</span>
           </h1>
           
@@ -151,7 +151,7 @@ export default async function HomePage() {
                 type="text" 
                 name="q"
                 placeholder="¿Qué estás buscando? (ej. taladro, miel, auto...)" 
-                className="w-full bg-transparent border-none text-white placeholder-text-muted/70 focus:outline-none text-sm font-medium"
+                className="w-full bg-transparent border-none text-foreground placeholder-text-muted/70 focus:outline-none text-sm font-medium"
               />
             </div>
             <button type="submit" className="rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover px-6 py-3 text-xs font-extrabold text-background shadow-md hover:opacity-95 transition-all">
@@ -166,7 +166,7 @@ export default async function HomePage() {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
         <div className="flex items-end justify-between border-b border-card-border pb-5 mb-8">
           <div>
-            <h2 className="font-heading text-2xl font-bold tracking-tight text-white">Explorá por Categoría</h2>
+            <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground">Explorá por Categoría</h2>
             <p className="text-sm text-text-muted mt-1">Navegá las categorías más buscadas de la provincia.</p>
           </div>
           <Link href="/search" className="text-xs font-bold text-accent-gold hover:text-accent-gold-hover hover:underline transition-all">
@@ -182,7 +182,7 @@ export default async function HomePage() {
               className="flex flex-col items-center justify-center p-5 rounded-2xl glass-card text-center group"
             >
               <span className="text-3xl mb-3 transition-transform group-hover:scale-110">{cat.icon}</span>
-              <span className="text-xs font-bold text-white group-hover:text-accent-gold transition-colors">{cat.name}</span>
+              <span className="text-xs font-bold text-foreground group-hover:text-accent-gold transition-colors">{cat.name}</span>
               <span className="text-[10px] text-text-muted mt-1">{cat.count} publ.</span>
             </Link>
           ))}
@@ -193,7 +193,7 @@ export default async function HomePage() {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
         <div className="flex items-end justify-between border-b border-card-border pb-5 mb-8">
           <div>
-            <h2 className="font-heading text-2xl font-bold tracking-tight text-white">Publicaciones Destacadas</h2>
+            <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground">Publicaciones Destacadas</h2>
             <p className="text-sm text-text-muted mt-1">Ofertas destacadas con excelente reputación de vendedor.</p>
           </div>
           <Link href="/search" className="text-xs font-bold text-accent-gold hover:text-accent-gold-hover hover:underline transition-all">
@@ -235,7 +235,7 @@ export default async function HomePage() {
                   </span>
                 </div>
 
-                <h3 className="font-heading font-bold text-sm text-white group-hover:text-accent-gold transition-colors line-clamp-1">
+                <h3 className="font-heading font-bold text-sm text-foreground group-hover:text-accent-gold transition-colors line-clamp-1">
                   {listing.product.name}
                 </h3>
                 
@@ -245,7 +245,7 @@ export default async function HomePage() {
 
                 <div className="flex items-baseline gap-1 mt-auto">
                   <span className="text-xs font-semibold text-accent-gold">$</span>
-                  <span className="text-lg font-extrabold text-white">
+                  <span className="text-lg font-extrabold text-foreground">
                     {listing.price.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -253,7 +253,7 @@ export default async function HomePage() {
                 {/* Seller Bar */}
                 <div className="border-t border-card-border/50 pt-3 mt-1 flex items-center justify-between">
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-bold text-white leading-none">
+                    <span className="text-[10px] font-bold text-foreground leading-none">
                       {listing.seller.name}
                     </span>
                     <span className="text-[8px] text-text-muted mt-0.5 uppercase">

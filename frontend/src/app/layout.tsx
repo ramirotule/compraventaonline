@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Link from "next/link";
+import ThemeToggle from "../components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "CompraVentaOnline - El Marketplace de La Pampa",
@@ -15,6 +16,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className="h-full scroll-smooth">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem('theme');
+                  if (saved === 'light' || saved === 'dark') {
+                    document.documentElement.setAttribute('data-theme', saved);
+                  } else {
+                    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+                  }
+                } catch (e) {}
+              })()
+            `,
+          }}
+        />
+      </head>
       <body className="flex min-h-screen flex-col font-sans bg-background text-foreground antialiased selection:bg-accent-gold selection:text-background">
         
         {/* Navigation Header */}
@@ -67,6 +87,9 @@ export default function RootLayout({
                 </svg>
                 Publicar
               </Link>
+
+              {/* Theme Toggle Button */}
+              <ThemeToggle />
 
               <Link href="/login" className="rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover px-5 py-2 text-xs font-extrabold text-background shadow-md hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all">
                 Ingresar

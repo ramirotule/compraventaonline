@@ -110,18 +110,18 @@ export default function DashboardPage() {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 w-full">
       <div className="flex flex-col md:flex-row items-start justify-between gap-6 border-b border-card-border pb-6 mb-8">
         <div>
-          <h1 className="font-heading text-3xl font-extrabold text-white">Panel de Vendedor</h1>
+          <h1 className="font-heading text-3xl font-extrabold text-foreground">Panel de Vendedor</h1>
           <p className="text-text-muted text-sm mt-1">
             Gestioná tus publicaciones, controlá tu stock y consultá tus métricas comerciales.
           </p>
         </div>
         
         {/* Navigation Tabs */}
-        <div className="flex bg-slate-900 border border-card-border p-1 rounded-xl">
+        <div className="flex bg-card-bg border border-card-border p-1 rounded-xl">
           <button 
             onClick={() => setActiveTab("summary")}
             className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-              activeTab === "summary" ? "bg-accent-gold text-background shadow-md" : "text-white hover:text-accent-gold"
+              activeTab === "summary" ? "bg-accent-gold text-background shadow-md" : "text-foreground/80 hover:text-accent-gold"
             }`}
           >
             Resumen
@@ -129,7 +129,7 @@ export default function DashboardPage() {
           <button 
             onClick={() => setActiveTab("publish")}
             className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-              activeTab === "publish" ? "bg-accent-gold text-background shadow-md" : "text-white hover:text-accent-gold"
+              activeTab === "publish" ? "bg-accent-gold text-background shadow-md" : "text-foreground/80 hover:text-accent-gold"
             }`}
           >
             Publicar Artículo
@@ -137,7 +137,7 @@ export default function DashboardPage() {
           <button 
             onClick={() => setActiveTab("inventory")}
             className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-              activeTab === "inventory" ? "bg-accent-gold text-background shadow-md" : "text-white hover:text-accent-gold"
+              activeTab === "inventory" ? "bg-accent-gold text-background shadow-md" : "text-foreground/80 hover:text-accent-gold"
             }`}
           >
             Inventario ({myListings.length})
@@ -153,15 +153,15 @@ export default function DashboardPage() {
             
             {/* Seller profile card */}
             <div className="col-span-1 md:col-span-2 rounded-2xl glass-panel p-6 flex flex-col gap-4">
-              <h3 className="font-heading text-sm font-extrabold text-white uppercase tracking-wider">Perfil Comercial</h3>
+              <h3 className="font-heading text-sm font-extrabold text-foreground uppercase tracking-wider">Perfil Comercial</h3>
               <div>
-                <h4 className="text-xl font-bold text-white">{sellerProfile.name}</h4>
+                <h4 className="text-xl font-bold text-foreground">{sellerProfile.name}</h4>
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-green/10 px-2.5 py-0.5 text-xs font-semibold text-accent-green border border-accent-green/20 mt-2">
                   💼 Cuenta: {sellerProfile.type === "BUSINESS_SELLER" ? "Comercio / Empresa" : "Particular"}
                 </span>
               </div>
               <div className="border-t border-card-border/50 pt-4 flex justify-between text-xs text-text-muted">
-                <span>Plan Actual: <strong className="text-white">{sellerProfile.plan}</strong></span>
+                <span>Plan Actual: <strong className="text-foreground">{sellerProfile.plan}</strong></span>
                 <span>Tier de Venta: <strong className="text-accent-gold">{sellerProfile.tier}</strong></span>
               </div>
             </div>
@@ -179,7 +179,7 @@ export default function DashboardPage() {
             {/* Active listings summary */}
             <div className="rounded-2xl glass-panel p-6 flex flex-col items-center justify-center text-center">
               <h3 className="font-heading text-xs font-extrabold text-text-muted uppercase tracking-wider mb-2">Publicaciones Activas</h3>
-              <span className="text-5xl font-extrabold text-white font-heading">{myListings.length}</span>
+              <span className="text-5xl font-extrabold text-foreground font-heading">{myListings.length}</span>
               <p className="text-[10px] text-text-muted mt-4">Límite disponible: {sellerProfile.type === "BUSINESS_SELLER" ? "Ilimitado" : `${5 - myListings.length} de 5 libres`}</p>
             </div>
 
@@ -189,7 +189,7 @@ export default function DashboardPage() {
         {/* TAB 2: Publish Form */}
         {activeTab === "publish" && (
           <div className="max-w-3xl mx-auto w-full rounded-2xl glass-panel p-8">
-            <h2 className="font-heading text-lg font-bold text-white mb-6">Formulario de Publicación Directa</h2>
+            <h2 className="font-heading text-lg font-bold text-foreground mb-6">Formulario de Publicación Directa</h2>
             
             {successMsg && (
               <div className="bg-accent-green/10 border border-accent-green/30 rounded-xl p-4 text-xs font-medium text-accent-green mb-6">
@@ -201,81 +201,81 @@ export default function DashboardPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-white">Nombre del Producto</label>
+                  <label className="text-xs font-bold text-foreground">Nombre del Producto</label>
                   <input 
                     type="text" 
                     required
                     value={productName}
                     onChange={(e) => setProductName(e.target.value)}
                     placeholder="Ej. Taladro Bosch 500W" 
-                    className="w-full bg-slate-900 border border-card-border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-accent-gold"
+                    className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-white">Marca</label>
+                  <label className="text-xs font-bold text-foreground">Marca</label>
                   <input 
                     type="text" 
                     required
                     value={brand}
                     onChange={(e) => setBrand(e.target.value)}
                     placeholder="Ej. Bosch" 
-                    className="w-full bg-slate-900 border border-card-border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-accent-gold"
+                    className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
                   />
                 </div>
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-white">Descripción Técnica</label>
+                <label className="text-xs font-bold text-foreground">Descripción Técnica</label>
                 <textarea 
                   required
                   rows={4}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Detalla las características del artículo..." 
-                  className="w-full bg-slate-900 border border-card-border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-accent-gold resize-none"
+                  className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-white">Precio ($ ARS)</label>
+                  <label className="text-xs font-bold text-foreground">Precio ($ ARS)</label>
                   <input 
                     type="number" 
                     required
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder="Ej. 125000" 
-                    className="w-full bg-slate-900 border border-card-border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-accent-gold"
+                    className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-white">Condición</label>
+                  <label className="text-xs font-bold text-foreground">Condición</label>
                   <select 
                     value={condition}
                     onChange={(e) => setCondition(e.target.value)}
-                    className="w-full bg-slate-900 border border-card-border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-accent-gold"
+                    className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
                   >
                     <option value="NEW">Nuevo</option>
                     <option value="USED">Usado</option>
                   </select>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-white">Stock Inicial</label>
+                  <label className="text-xs font-bold text-foreground">Stock Inicial</label>
                   <input 
                     type="number" 
                     required
                     value={stock}
                     onChange={(e) => setStock(e.target.value)}
                     placeholder="Ej. 5" 
-                    className="w-full bg-slate-900 border border-card-border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-accent-gold"
+                    className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-white">Categoría</label>
+                  <label className="text-xs font-bold text-foreground">Categoría</label>
                   <select 
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full bg-slate-900 border border-card-border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-accent-gold"
+                    className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
                   >
                     <option value="tecnologia">Tecnología</option>
                     <option value="hogar">Hogar</option>
@@ -301,7 +301,7 @@ export default function DashboardPage() {
         {/* TAB 3: Inventory List */}
         {activeTab === "inventory" && (
           <div className="w-full rounded-2xl glass-panel p-6 overflow-hidden">
-            <h3 className="font-heading text-sm font-extrabold text-white uppercase tracking-wider mb-6">Listado de Artículos</h3>
+            <h3 className="font-heading text-sm font-extrabold text-foreground uppercase tracking-wider mb-6">Listado de Artículos</h3>
             
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
@@ -318,8 +318,8 @@ export default function DashboardPage() {
                 </thead>
                 <tbody className="divide-y divide-card-border/30">
                   {myListings.map((listing) => (
-                    <tr key={listing.id} className="hover:bg-slate-900/30 transition-colors">
-                      <td className="py-4 pr-4 font-bold text-white">{listing.product.name}</td>
+                    <tr key={listing.id} className="hover:bg-card-bg/30 transition-colors">
+                      <td className="py-4 pr-4 font-bold text-foreground">{listing.product.name}</td>
                       <td className="py-4 px-4 text-text-muted">{listing.product.brand}</td>
                       <td className="py-4 px-4 text-center">
                         <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
@@ -328,10 +328,10 @@ export default function DashboardPage() {
                           {listing.condition === "NEW" ? "NUEVO" : "USADO"}
                         </span>
                       </td>
-                      <td className="py-4 px-4 text-right font-extrabold text-white">
+                      <td className="py-4 px-4 text-right font-extrabold text-foreground">
                         ${listing.price.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
                       </td>
-                      <td className="py-4 px-4 text-center font-bold text-white">{listing.stock}</td>
+                      <td className="py-4 px-4 text-center font-bold text-foreground">{listing.stock}</td>
                       <td className="py-4 px-4 text-center">
                         <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-accent-green/10 text-accent-green">
                           {listing.status}
@@ -341,13 +341,13 @@ export default function DashboardPage() {
                         <div className="inline-flex gap-1.5">
                           <button 
                             onClick={() => handleUpdateStock(listing.id, -1)}
-                            className="bg-slate-800 border border-card-border text-white h-7 w-7 rounded-lg font-bold hover:border-accent-gold transition-all"
+                            className="bg-card-bg border border-card-border text-foreground h-7 w-7 rounded-lg font-bold hover:border-accent-gold transition-all flex items-center justify-center cursor-pointer"
                           >
                             -
                           </button>
                           <button 
                             onClick={() => handleUpdateStock(listing.id, 1)}
-                            className="bg-slate-800 border border-card-border text-white h-7 w-7 rounded-lg font-bold hover:border-accent-gold transition-all"
+                            className="bg-card-bg border border-card-border text-foreground h-7 w-7 rounded-lg font-bold hover:border-accent-gold transition-all flex items-center justify-center cursor-pointer"
                           >
                             +
                           </button>
