@@ -1,0 +1,158 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum SellerType {
+  PERSONAL_SELLER
+  BUSINESS_SELLER
+}
+
+enum SellerTier {
+  BRONCE
+  PLATA
+  ORO
+  PREMIUM
+}
+
+enum Condition {
+  NEW
+  USED
+}
+
+enum ListingStatus {
+  APPROVED
+  REVIEW_REQUIRED
+  BLOCKED
+}
+
+enum FeaturedPlan {
+  FREE
+  FEATURED
+  PREMIUM
+}
+
+enum ReportReason {
+  FRAUD
+  ILLEGAL_PRODUCT
+  OFFENSIVE
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED_APPROVED
+  RESOLVED_BLOCKED
+}
+
+model User {
+  id               String            @id @default(uuid()) @db.Uuid
+  email            String            @unique
+  passwordHash     String            @map("password_hash")
+  fullName         String            @map("full_name")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  seller           Seller?
+  termsAcceptances TermsAcceptance[]
+  reports          ProductReport[]
+
+  @@map("users")
+}
+
+model Seller {
+  id             String     @id @default(uuid()) @db.Uuid
+  userId         String     @unique @map("user_id") @db.Uuid
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type           SellerType
+  name           String
+  documentNumber String     @map("document_number")
+  score          Int        @default(100)
+  tier           SellerTier @default(BRONCE)
+  createdAt      DateTime   @default(now()) @map("created_at")
+  listings       Listing[]
+
+  @@map("sellers")
+}
+
+model TermsAcceptance {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  acceptedTerms Boolean  @default(true) @map("accepted_terms")
+  version      String
+  acceptedDate DateTime @default(now()) @map("accepted_date")
+
+  @@map("terms_acceptances")
+}
+
+model Category {
+  id               String     @id @default(uuid()) @db.Uuid
+  name             String
+  slug             String     @unique
+  parentId         String?    @map("parent_id") @db.Uuid
+  parent           Category?  @relation("CategoryToCategory", fields: [parentId], references: [id], onDelete: Cascade)
+  subCategories    Category[] @relation("CategoryToCategory")
+  products         Product[]
+  attributesSchema Json       @map("attributes_schema")
+
+  @@map("categories")
+}
+
+model Product {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String
+  brand       String
+  categoryId  String    @map("category_id") @db.Uuid
+  category    Category  @relation(fields: [categoryId], references: [id])
+  images      String[]
+  attributes  Json
+  listings    Listing[]
+
+  @@map("products")
+}
+
+model Listing {
+  id           String               @id @default(uuid()) @db.Uuid
+  productId    String               @map("product_id") @db.Uuid
+  product      Product              @relation(fields: [productId], references: [id])
+  sellerId     String               @map("seller_id") @db.Uuid
+  seller       Seller               @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  price        Decimal              @db.Decimal(12, 2)
+  condition    Condition
+  stock        Int
+  status       ListingStatus        @default(REVIEW_REQUIRED)
+  featuredPlan FeaturedPlan         @default(FREE) @map("featured_plan")
+  images       String[]
+  createdAt    DateTime             @default(now()) @map("created_at")
+  highlights   HighlightedProduct[]
+  reports      ProductReport[]
+
+  @@map("listings")
+}
+
+model HighlightedProduct {
+  id        String       @id @default(uuid()) @db.Uuid
+  listingId String       @map("listing_id") @db.Uuid
+  listing   Listing      @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  plan      FeaturedPlan
+  startDate DateTime     @map("start_date")
+  endDate   DateTime     @map("end_date")
+
+  @@map("highlighted_products")
+}
+
+model ProductReport {
+  id             String       @id @default(uuid()) @db.Uuid
+  reporterUserId String       @map("reporter_user_id") @db.Uuid
+  user           User         @relation(fields: [reporterUserId], references: [id])
+  listingId      String       @map("listing_id") @db.Uuid
+  listing        Listing      @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reason         ReportReason
+  description    String
+  status         ReportStatus @default(PENDING)
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@map("product_reports")
+}
