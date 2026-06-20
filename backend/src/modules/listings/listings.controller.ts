@@ -22,6 +22,7 @@ export class ListingsController {
     @Query('condition') condition?: 'NEW' | 'USED',
     @Query('q') q?: string,
     @Query('sort') sort?: 'price_asc' | 'price_desc' | 'relevance',
+    @Query('seller_id') sellerId?: string,
   ) {
     return this.listingsService.findListings({
       productId,
@@ -30,6 +31,7 @@ export class ListingsController {
       condition,
       q,
       sort,
+      sellerId,
     });
   }
 

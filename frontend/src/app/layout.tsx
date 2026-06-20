@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Link from "next/link";
 import ThemeToggle from "../components/ThemeToggle";
+import HeaderSessionBar from "../components/HeaderSessionBar";
 
 export const metadata: Metadata = {
   title: "CompraVentaOnline - El Marketplace de La Pampa",
@@ -74,26 +75,8 @@ export default function RootLayout({
 
             {/* User Session Bar */}
             <div className="flex items-center gap-4">
-              <Link href="/search" className="p-2 text-text-muted hover:text-foreground transition-colors md:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-              </Link>
-              
-              <Link href="/dashboard" className="hidden sm:inline-flex items-center gap-2 rounded-xl bg-card-bg px-4 py-2 text-xs font-bold text-accent-gold border border-accent-gold/20 hover:border-accent-gold/50 transition-all hover:shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 5v14M5 12h14"/>
-                </svg>
-                Publicar
-              </Link>
-
-              {/* Theme Toggle Button */}
               <ThemeToggle />
-
-              <Link href="/login" className="rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover px-5 py-2 text-xs font-extrabold text-background shadow-md hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all">
-                Ingresar
-              </Link>
+              <HeaderSessionBar />
             </div>
 
           </div>

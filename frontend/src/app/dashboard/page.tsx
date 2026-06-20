@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface Listing {
   id: string;
@@ -15,45 +17,35 @@ interface Listing {
   };
 }
 
+interface SellerProfile {
+  id: string;
+  name: string;
+  type: string;
+  score: number;
+  tier: string;
+  plan: string;
+}
+
+interface BackendCategory {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export default function DashboardPage() {
+  const router = useRouter();
+  
+  // Auth state
+  const [token, setToken] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
+
+  // Domain states
+  const [sellerProfile, setSellerProfile] = useState<SellerProfile | null>(null);
+  const [myListings, setMyListings] = useState<Listing[]>([]);
+  const [categories, setCategories] = useState<BackendCategory[]>([]);
   const [activeTab, setActiveTab] = useState<"summary" | "publish" | "inventory">("summary");
   
-  // Mock states for demonstration
-  const [sellerProfile, setSellerProfile] = useState({
-    name: "Ferretería El Pampeano",
-    type: "BUSINESS_SELLER",
-    score: 95,
-    tier: "GOLD",
-    plan: "PRO_BUSINESS",
-  });
-
-  const [myListings, setMyListings] = useState<Listing[]>([
-    {
-      id: "l1",
-      price: 125000.0,
-      condition: "NEW",
-      stock: 12,
-      status: "APPROVED",
-      product: {
-        name: "Taladro Percutor Bosch 500W",
-        brand: "Bosch",
-        description: "Taladro percutor profesional en caja cerrada.",
-      },
-    },
-    {
-      id: "l2",
-      price: 18500.0,
-      condition: "NEW",
-      stock: 45,
-      status: "APPROVED",
-      product: {
-        name: "Miel Orgánica Pura del Caldenal",
-        brand: "Pampeana Alta",
-        description: "Frasco de 1kg cosechado artesanalmente.",
-      },
-    },
-  ]);
-
   // Form states
   const [productName, setProductName] = useState("");
   const [brand, setBrand] = useState("");
@@ -61,50 +53,209 @@ export default function DashboardPage() {
   const [price, setPrice] = useState("");
   const [condition, setCondition] = useState("NEW");
   const [stock, setStock] = useState("5");
-  const [category, setCategory] = useState("tecnologia");
+  const [categoryId, setCategoryId] = useState("");
+  const [featuredPlan, setFeaturedPlan] = useState("FREE");
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  // Check auth and mount
+  useEffect(() => {
+    setMounted(true);
+    const savedToken = localStorage.getItem("token");
+    if (!savedToken) {
+      router.push("/login");
+    } else {
+      setToken(savedToken);
+    }
+  }, [router]);
+
+  // Load profile and categories once token is available
+  useEffect(() => {
+    if (!token) return;
+
+    async function loadDashboardData() {
+      try {
+        // 1. Fetch Profile
+        const profileRes = await fetch("http://localhost:3001/api/sellers/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        
+        if (!profileRes.ok) {
+          if (profileRes.status === 401 || profileRes.status === 403) {
+            localStorage.removeItem("token");
+            router.push("/login");
+            return;
+          }
+          throw new Error("No pudimos encontrar tu perfil de vendedor.");
+        }
+        
+        const profileData = await profileRes.json();
+        setSellerProfile(profileData);
+
+        // 2. Fetch Categories
+        const catRes = await fetch("http://localhost:3001/api/products/categories");
+        if (catRes.ok) {
+          const catData = await catRes.json();
+          // Mapeamos tanto raíces como subcategorías en una sola lista plana para facilitar la selección
+          const flatCategories: BackendCategory[] = [];
+          catData.forEach((cat: any) => {
+            flatCategories.push({ id: cat.id, name: cat.name, slug: cat.slug });
+            if (cat.subCategories && cat.subCategories.length > 0) {
+              cat.subCategories.forEach((sub: any) => {
+                flatCategories.push({ id: sub.id, name: `↳ ${sub.name}`, slug: sub.slug });
+              });
+            }
+          });
+          setCategories(flatCategories);
+          if (flatCategories.length > 0) {
+            setCategoryId(flatCategories[0].id);
+          }
+        }
+
+        // 3. Fetch Seller Listings
+        const listingsRes = await fetch(`http://localhost:3001/api/listings?seller_id=${profileData.id}`);
+        if (listingsRes.ok) {
+          const listingsData = await listingsRes.json();
+          setMyListings(listingsData);
+        }
+      } catch (err: any) {
+        setErrorMsg(err.message || "Error al cargar los datos del panel.");
+      } finally {
+        setPageLoading(false);
+      }
+    }
+
+    loadDashboardData();
+  }, [token, router]);
 
   const handlePublish = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setSuccessMsg("");
+    setErrorMsg("");
 
-    // Simulate calling the API endpoints sequentially
-    setTimeout(() => {
-      const newListing: Listing = {
-        id: "l-" + Math.random().toString(36).substr(2, 9),
-        price: parseFloat(price) || 0,
-        condition,
-        stock: parseInt(stock) || 0,
-        status: "APPROVED",
-        product: {
-          name: productName,
-          brand,
-          description,
+    try {
+      // Step 1: Create Global Product
+      const productRes = await fetch("http://localhost:3001/api/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      };
+        body: JSON.stringify({
+          name: productName,
+          description,
+          brand,
+          categoryId,
+          images: ["https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=600&auto=format&fit=crop"],
+        }),
+      });
 
-      setMyListings([newListing, ...myListings]);
-      setSuccessMsg("¡Publicación creada con éxito! Pasó la moderación automática y ya está activa en el catálogo.");
+      const productData = await productRes.json();
+      if (!productRes.ok) {
+        throw new Error(productData.message || "Error al registrar el producto en el catálogo.");
+      }
+
+      // Step 2: Create Listing for the Product
+      const listingRes = await fetch("http://localhost:3001/api/listings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId: productData.id,
+          price: parseFloat(price),
+          condition,
+          stock: parseInt(stock),
+          featuredPlan,
+          images: ["https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=600&auto=format&fit=crop"],
+        }),
+      });
+
+      const listingData = await listingRes.json();
+      if (!listingRes.ok) {
+        throw new Error(listingData.message || "Error al crear la publicación.");
+      }
+
+      // Update local state
+      setMyListings([listingData, ...myListings]);
+      setSuccessMsg("¡Publicación creada con éxito! Pasó la moderación de contenido y ya se encuentra activa.");
+      
+      // Reset form
       setProductName("");
       setBrand("");
       setDescription("");
       setPrice("");
       setStock("5");
+    } catch (err: any) {
+      setErrorMsg(err.message || "Ocurrió un error al procesar tu publicación.");
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   };
 
-  const handleUpdateStock = (id: string, amount: number) => {
-    setMyListings(myListings.map(l => {
-      if (l.id === id) {
-        const newStock = Math.max(0, l.stock + amount);
-        return { ...l, stock: newStock };
+  const handleUpdateStock = async (id: string, amount: number) => {
+    const listing = myListings.find(l => l.id === id);
+    if (!listing) return;
+
+    const newStock = Math.max(0, listing.stock + amount);
+
+    try {
+      const res = await fetch(`http://localhost:3001/api/listings/${id}/stock`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ stock: newStock }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "No se pudo actualizar el stock.");
       }
-      return l;
-    }));
+
+      // Sync local listings state
+      setMyListings(myListings.map(l => (l.id === id ? { ...l, stock: newStock } : l)));
+    } catch (err: any) {
+      alert(err.message || "Error al actualizar stock.");
+    }
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    router.push("/");
+    router.refresh();
+  };
+
+  if (!mounted || pageLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-gold border-t-transparent"></div>
+          <span className="text-sm font-semibold text-text-muted">Cargando panel de control pampeano...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!sellerProfile) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 text-center">
+        <span className="text-5xl">🌾</span>
+        <h2 className="font-heading text-2xl font-bold text-foreground mt-4">Perfil no encontrado</h2>
+        <p className="text-text-muted text-sm mt-2">No pudimos vincular un perfil comercial con esta cuenta de usuario.</p>
+        <button 
+          onClick={handleLogout} 
+          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover px-6 py-3 text-xs font-bold text-background shadow-md cursor-pointer"
+        >
+          Volver a iniciar sesión
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 w-full">
@@ -116,34 +267,49 @@ export default function DashboardPage() {
           </p>
         </div>
         
-        {/* Navigation Tabs */}
-        <div className="flex bg-card-bg border border-card-border p-1 rounded-xl">
+        {/* Navigation Tabs and Logout */}
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex bg-card-bg border border-card-border p-1 rounded-xl">
+            <button 
+              onClick={() => setActiveTab("summary")}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                activeTab === "summary" ? "bg-accent-gold text-background shadow-md" : "text-foreground/80 hover:text-accent-gold"
+              }`}
+            >
+              Resumen
+            </button>
+            <button 
+              onClick={() => setActiveTab("publish")}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                activeTab === "publish" ? "bg-accent-gold text-background shadow-md" : "text-foreground/80 hover:text-accent-gold"
+              }`}
+            >
+              Publicar Artículo
+            </button>
+            <button 
+              onClick={() => setActiveTab("inventory")}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                activeTab === "inventory" ? "bg-accent-gold text-background shadow-md" : "text-foreground/80 hover:text-accent-gold"
+              }`}
+            >
+              Inventario ({myListings.length})
+            </button>
+          </div>
+
           <button 
-            onClick={() => setActiveTab("summary")}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-              activeTab === "summary" ? "bg-accent-gold text-background shadow-md" : "text-foreground/80 hover:text-accent-gold"
-            }`}
+            onClick={handleLogout}
+            className="rounded-xl border border-red-500/20 hover:border-red-500 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-500/5 transition-all cursor-pointer"
           >
-            Resumen
-          </button>
-          <button 
-            onClick={() => setActiveTab("publish")}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-              activeTab === "publish" ? "bg-accent-gold text-background shadow-md" : "text-foreground/80 hover:text-accent-gold"
-            }`}
-          >
-            Publicar Artículo
-          </button>
-          <button 
-            onClick={() => setActiveTab("inventory")}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-              activeTab === "inventory" ? "bg-accent-gold text-background shadow-md" : "text-foreground/80 hover:text-accent-gold"
-            }`}
-          >
-            Inventario ({myListings.length})
+            Cerrar Sesión
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div className="bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl p-3 text-xs font-semibold mb-6">
+          ⚠️ {errorMsg}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-8">
         
@@ -207,7 +373,7 @@ export default function DashboardPage() {
                     required
                     value={productName}
                     onChange={(e) => setProductName(e.target.value)}
-                    placeholder="Ej. Taladro Bosch 500W" 
+                    placeholder="Ej. Miel de Caldén o Amoladora Industrial" 
                     className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
                   />
                 </div>
@@ -218,7 +384,7 @@ export default function DashboardPage() {
                     required
                     value={brand}
                     onChange={(e) => setBrand(e.target.value)}
-                    placeholder="Ej. Bosch" 
+                    placeholder="Ej. Estancia La Pampa" 
                     className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
                   />
                 </div>
@@ -273,23 +439,34 @@ export default function DashboardPage() {
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-bold text-foreground">Categoría</label>
                   <select 
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    value={categoryId}
+                    onChange={(e) => setCategoryId(e.target.value)}
                     className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
                   >
-                    <option value="tecnologia">Tecnología</option>
-                    <option value="hogar">Hogar</option>
-                    <option value="vehiculos">Vehículos</option>
-                    <option value="campo-agro">Campo / Agro</option>
-                    <option value="construccion">Construcción</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
                   </select>
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold text-foreground">Plan de Destacado (Monetización)</label>
+                <select 
+                  value={featuredPlan}
+                  onChange={(e) => setFeaturedPlan(e.target.value)}
+                  className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
+                >
+                  <option value="FREE">Plan Gratuito (FREE)</option>
+                  <option value="FEATURED">Plan Destacado (FEATURED)</option>
+                  <option value="PREMIUM">Plan Premium (PREMIUM)</option>
+                </select>
               </div>
 
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover py-4 text-xs font-extrabold text-background shadow-md hover:opacity-95 transition-all mt-4 disabled:opacity-50"
+                className="w-full rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover py-4 text-xs font-extrabold text-background shadow-md hover:opacity-95 transition-all mt-4 disabled:opacity-50 cursor-pointer"
               >
                 {loading ? "Publicando en el Catálogo..." : "Confirmar Publicación"}
               </button>
@@ -319,7 +496,11 @@ export default function DashboardPage() {
                 <tbody className="divide-y divide-card-border/30">
                   {myListings.map((listing) => (
                     <tr key={listing.id} className="hover:bg-card-bg/30 transition-colors">
-                      <td className="py-4 pr-4 font-bold text-foreground">{listing.product.name}</td>
+                      <td className="py-4 pr-4 font-bold text-foreground">
+                        <Link href={`/listings/${listing.id}`} className="hover:text-accent-gold transition-colors">
+                          {listing.product.name}
+                        </Link>
+                      </td>
                       <td className="py-4 px-4 text-text-muted">{listing.product.brand}</td>
                       <td className="py-4 px-4 text-center">
                         <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
@@ -333,8 +514,10 @@ export default function DashboardPage() {
                       </td>
                       <td className="py-4 px-4 text-center font-bold text-foreground">{listing.stock}</td>
                       <td className="py-4 px-4 text-center">
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-accent-green/10 text-accent-green">
-                          {listing.status}
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                          listing.status === "APPROVED" ? "bg-accent-green/10 text-accent-green" : "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400"
+                        }`}>
+                          {listing.status === "APPROVED" ? "APROBADO" : "EN REVISIÓN"}
                         </span>
                       </td>
                       <td className="py-4 pl-4 text-right">

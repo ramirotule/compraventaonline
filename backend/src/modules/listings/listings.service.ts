@@ -73,6 +73,7 @@ export class ListingsService {
     condition?: 'NEW' | 'USED';
     q?: string;
     sort?: 'price_asc' | 'price_desc' | 'relevance';
+    sellerId?: string;
   }) {
     const whereClause: any = {
       status: ListingStatus.APPROVED,
@@ -84,6 +85,12 @@ export class ListingsService {
 
     if (filters.condition) {
       whereClause.condition = filters.condition;
+    }
+
+    if (filters.sellerId) {
+      whereClause.sellerId = filters.sellerId;
+      // Los vendedores pueden ver sus publicaciones en cualquier estado (aprobadas, pendientes, etc.)
+      delete whereClause.status;
     }
 
     if (filters.minPrice || filters.maxPrice) {
