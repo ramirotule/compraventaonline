@@ -252,7 +252,7 @@ export default async function SearchPage({
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {listings.map((listing) => (
-                <div key={listing.id} className="group flex flex-col rounded-2xl glass-card overflow-hidden relative">
+                <Link key={listing.id} href={`/listings/${listing.id}`} className="group flex flex-col rounded-2xl glass-card overflow-hidden relative cursor-pointer">
                   {listing.featuredPlan !== "FREE" && (
                     <span className="absolute top-3 left-3 z-10 rounded-lg bg-accent-gold px-2 py-0.5 text-[10px] font-extrabold tracking-wider text-background shadow-md uppercase">
                       💎 PREMIUM
@@ -299,7 +299,7 @@ export default async function SearchPage({
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

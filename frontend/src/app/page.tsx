@@ -203,9 +203,10 @@ export default async function HomePage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {listings.map((listing) => (
-            <div 
+            <Link 
               key={listing.id}
-              className="group flex flex-col rounded-2xl glass-card overflow-hidden relative"
+              href={`/listings/${listing.id}`}
+              className="group flex flex-col rounded-2xl glass-card overflow-hidden relative cursor-pointer"
             >
               {/* Badge Plan */}
               {listing.featuredPlan !== "FREE" && (
@@ -268,7 +269,7 @@ export default async function HomePage() {
 
               </div>
 
-            </div>
+            </Link>
           ))}
         </div>
       </section>
