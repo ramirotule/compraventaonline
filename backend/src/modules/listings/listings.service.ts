@@ -2,10 +2,14 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException 
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { ListingStatus, FeaturedPlan } from '@prisma/client';
+import { ModerationService } from '../moderation/moderation.service';
 
 @Injectable()
 export class ListingsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private moderationService: ModerationService,
+  ) {}
 
   async create(userId: string, dto: CreateListingDto) {
     // Verificar si el usuario es vendedor
@@ -39,17 +43,8 @@ export class ListingsService {
       throw new BadRequestException('Límite alcanzado: Los vendedores particulares solo pueden tener hasta 5 publicaciones activas de forma simultánea.');
     }
 
-    // Moderación básica (RN-03 preventiva)
-    let status: ListingStatus = ListingStatus.APPROVED;
-    const forbiddenWords = ['droga', 'arma', 'cocaína', 'pistola', 'marihuana', 'falso'];
-    const textToCheck = `${product.name} ${product.brand}`.toLowerCase();
-    
-    for (const word of forbiddenWords) {
-      if (textToCheck.includes(word)) {
-        status = ListingStatus.BLOCKED;
-        break;
-      }
-    }
+    // Moderación automática (RN-03 preventiva) utilizando ModerationService
+    const status = await this.moderationService.moderateText(product.name, product.description);
 
     return this.prisma.listing.create({
       data: {

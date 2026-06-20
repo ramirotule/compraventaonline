@@ -42,6 +42,7 @@ export class CatalogService {
     return this.prisma.product.create({
       data: {
         name: dto.name,
+        description: dto.description,
         brand: dto.brand,
         categoryId: dto.categoryId,
         images: dto.images || [],

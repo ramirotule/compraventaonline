@@ -5,6 +5,10 @@ export class CreateProductDto {
   @IsNotEmpty({ message: 'El nombre del producto es requerido' })
   name: string;
 
+  @IsString({ message: 'La descripción del producto debe ser un texto' })
+  @IsNotEmpty({ message: 'La descripción del producto es requerida' })
+  description: string;
+
   @IsString({ message: 'La marca debe ser un texto' })
   @IsNotEmpty({ message: 'La marca es requerida' })
   brand: string;
