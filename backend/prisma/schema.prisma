@@ -157,3 +157,16 @@ model ProductReport {
 
   @@map("product_reports")
 }
+
+model Advertisement {
+  id             String   @id @default(uuid()) @db.Uuid
+  advertiserName String   @map("advertiser_name")
+  type           String   // e.g., BANNER, SPONSORED_CARD
+  imageUrl       String   @map("image_url")
+  targetUrl      String   @map("target_url")
+  active         Boolean  @default(true)
+  startDate      DateTime @map("start_date")
+  endDate        DateTime @map("end_date")
+
+  @@map("advertisements")
+}

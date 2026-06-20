@@ -9,6 +9,7 @@ import { CatalogModule } from './modules/catalog/catalog.module';
 import { ListingsModule } from './modules/listings/listings.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
 import { ReputationModule } from './modules/reputation/reputation.module';
+import { MarketingModule } from './modules/marketing/marketing.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ReputationModule } from './modules/reputation/reputation.module';
     ListingsModule,
     ModerationModule,
     ReputationModule,
+    MarketingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
