@@ -152,8 +152,9 @@ export default function HeaderSessionBar() {
                     </svg>
                     Mi Panel / Perfil
                   </Link>
-                  <button 
-                    onClick={() => { setShowUserMenu(false); alert("Próximamente: Tus Compras en CompraVentaOnline La Pampa"); }}
+                  <Link 
+                    href="/compras" 
+                    onClick={() => setShowUserMenu(false)}
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-foreground/80 hover:text-accent-gold hover:bg-card-border/30 transition-all w-full text-left cursor-pointer"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent-green">
@@ -162,7 +163,7 @@ export default function HeaderSessionBar() {
                       <path d="M16 10a4 4 0 0 1-8 0"></path>
                     </svg>
                     Mis Compras
-                  </button>
+                  </Link>
                   <button 
                     onClick={() => { setShowUserMenu(false); alert("Próximamente: Tus Favoritos de La Pampa"); }}
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-foreground/80 hover:text-accent-gold hover:bg-card-border/30 transition-all w-full text-left cursor-pointer"

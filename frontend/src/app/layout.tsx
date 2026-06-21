@@ -40,10 +40,10 @@ export default function RootLayout({
         
         {/* Navigation Header */}
         <header className="sticky top-0 z-50 w-full border-b border-card-border bg-background/85 backdrop-blur-md">
-          <div className="mx-auto flex max-w-7xl h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 w-full items-center justify-between pr-4 sm:pr-6 lg:pr-8">
             
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 group">
+            {/* Logo — pegado al borde izquierdo */}
+            <Link href="/" className="ml-[5px] flex shrink-0 items-center gap-2 group">
               <div className="flex h-10 w-10 items-center justify-between rounded-xl bg-gradient-to-tr from-accent-gold to-accent-green p-2 shadow-lg transition-transform group-hover:scale-105">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-background">
                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -61,7 +61,7 @@ export default function RootLayout({
             </Link>
 
             {/* Nav Menu */}
-            <nav className="hidden md:flex items-center gap-6">
+            <nav className="hidden md:flex flex-1 items-center justify-center gap-6">
               <Link href="/" className="text-sm font-semibold text-foreground/80 hover:text-accent-gold transition-colors">
                 Inicio
               </Link>
@@ -84,7 +84,7 @@ export default function RootLayout({
             </nav>
 
             {/* User Session Bar + theme (toggle al extremo derecho) */}
-            <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex shrink-0 items-center gap-3 sm:gap-4">
               <HeaderSessionBar />
               <div className="ml-1 pl-3 sm:pl-4 border-l border-card-border/40">
                 <ThemeToggle />
