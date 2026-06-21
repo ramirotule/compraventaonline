@@ -452,7 +452,7 @@ export default function ListingDetailPage() {
               ) : (
                 <button 
                   onClick={() => setShowCheckoutModal(true)}
-                  className="w-full rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover px-6 py-4 text-xs font-extrabold text-background text-center shadow-md hover:scale-[1.01] transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full rounded-xl bg-gradient-to-r from-accent-blue to-blue-600 px-6 py-4 text-xs font-extrabold text-white text-center shadow-md hover:scale-[1.01] transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <span>🛒</span> Comprar Producto
                 </button>
@@ -633,6 +633,19 @@ export default function ListingDetailPage() {
               </div>
             </div>
 
+            {/* Commitment Warning Banner */}
+            <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-500 dark:text-amber-300 p-4 text-xs leading-relaxed text-left flex flex-col gap-1.5 animate-in fade-in duration-200">
+              <strong className="font-extrabold flex items-center gap-1 text-[11px] uppercase tracking-wider">
+                ⚠️ Importante: Compromiso de Compra
+              </strong>
+              <p className="text-[10px] text-text-muted dark:text-slate-300">
+                Al realizar la compra de este producto asumís un <span className="font-bold text-foreground">compromiso de compra firme</span>. Si tenés dudas sobre el artículo, te recomendamos realizar una pregunta al vendedor antes de proceder.
+              </p>
+              <p className="text-[9.5px] text-text-muted/80">
+                Nota: Cancelaciones injustificadas con calificaciones negativas por parte del vendedor pueden implicar la <span className="font-bold text-red-500 dark:text-red-400">suspensión temporal o definitiva de tu cuenta</span>.
+              </p>
+            </div>
+
             {/* Payment Details Form */}
             <div className="flex flex-col gap-4 text-left">
               <div className="flex flex-col gap-1.5">
@@ -677,7 +690,7 @@ export default function ListingDetailPage() {
                 }, 1500);
               }}
               disabled={paymentLoading}
-              className="w-full rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover py-4 text-xs font-extrabold text-background shadow-md hover:scale-[1.01] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="w-full rounded-xl bg-gradient-to-r from-accent-blue to-blue-600 py-4 text-xs font-extrabold text-white shadow-md hover:scale-[1.01] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               {paymentLoading ? (
                 <>
