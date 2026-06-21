@@ -48,10 +48,11 @@ export default function LoginPage() {
         }
 
         // Save token & redirect
-        localStorage.setItem("token", data.accessToken);
+        localStorage.setItem("token", data.token);
+        window.dispatchEvent(new Event("auth-change"));
         setSuccessMsg("¡Inicio de sesión exitoso! Redireccionando...");
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/");
           router.refresh();
         }, 1500);
 
@@ -85,8 +86,9 @@ export default function LoginPage() {
           throw new Error("Cuenta creada, pero falló el inicio de sesión automático. Por favor inicia sesión.");
         }
 
-        const token = logData.accessToken;
+        const token = logData.token;
         localStorage.setItem("token", token);
+        window.dispatchEvent(new Event("auth-change"));
 
         // 3. Accept Terms on DB
         await fetch("http://localhost:3001/api/legal/accept", {
@@ -119,7 +121,7 @@ export default function LoginPage() {
 
         setSuccessMsg("¡Registro exitoso y perfil de vendedor creado! Redireccionando...");
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/");
           router.refresh();
         }, 1500);
       }

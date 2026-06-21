@@ -71,6 +71,13 @@ export default function DashboardPage() {
     } else {
       setToken(savedToken);
     }
+
+    // Parse URL query parameter for active tab
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    if (tab === "publish" || tab === "inventory" || tab === "rewards" || tab === "summary") {
+      setActiveTab(tab as any);
+    }
   }, [router]);
 
   // Load profile and categories once token is available
@@ -87,6 +94,7 @@ export default function DashboardPage() {
         if (!profileRes.ok) {
           if (profileRes.status === 401 || profileRes.status === 403) {
             localStorage.removeItem("token");
+            window.dispatchEvent(new Event("auth-change"));
             router.push("/login");
             return;
           }
@@ -277,6 +285,7 @@ export default function DashboardPage() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    window.dispatchEvent(new Event("auth-change"));
     router.push("/");
     router.refresh();
   };
@@ -294,7 +303,7 @@ export default function DashboardPage() {
 
   if (!sellerProfile) {
     return (
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 text-center">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 pb-16 text-center">
         <span className="text-5xl">🌾</span>
         <h2 className="font-heading text-2xl font-bold text-foreground mt-4">Perfil no encontrado</h2>
         <p className="text-text-muted text-sm mt-2">No pudimos vincular un perfil comercial con esta cuenta de usuario.</p>
@@ -318,7 +327,7 @@ export default function DashboardPage() {
           </p>
         </div>
         
-        {/* Navigation Tabs and Logout */}
+        {/* Navigation Tabs */}
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex bg-card-bg border border-card-border p-1 rounded-xl">
             <button 
@@ -354,13 +363,6 @@ export default function DashboardPage() {
               Mis Premios ({rewards.filter(r => !r.claimed).length})
             </button>
           </div>
-
-          <button 
-            onClick={handleLogout}
-            className="rounded-xl border border-red-500/20 hover:border-red-500 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-500/5 transition-all cursor-pointer"
-          >
-            Cerrar Sesión
-          </button>
         </div>
       </div>
 
