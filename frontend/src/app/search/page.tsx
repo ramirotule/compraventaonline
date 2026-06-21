@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CategorySearchDropdown from "../../components/CategorySearchDropdown";
 
 interface MockListing {
   id: string;
@@ -145,23 +146,46 @@ async function searchListings(params: {
   }
 }
 
+async function fetchCategories(): Promise<{ name: string; slug: string }[]> {
+  try {
+    const res = await fetch("http://localhost:3001/api/products/categories", {
+      next: { revalidate: 60 }
+    });
+    if (!res.ok) throw new Error();
+    const catData = await res.json();
+    const flat: { name: string; slug: string }[] = [{ name: "Todas las categorías", slug: "" }];
+    catData.forEach((cat: any) => {
+      flat.push({ name: cat.name, slug: cat.slug });
+      if (cat.subCategories && cat.subCategories.length > 0) {
+        cat.subCategories.forEach((sub: any) => {
+          flat.push({ name: `↳ ${sub.name}`, slug: sub.slug });
+        });
+      }
+    });
+    return flat;
+  } catch (error) {
+    return [
+      { name: "Todas las categorías", slug: "" },
+      { name: "Tecnología", slug: "tecnologia" },
+      { name: "Hogar", slug: "hogar" },
+      { name: "Vehículos", slug: "vehiculos" },
+      { name: "Campo / Agro", slug: "campo-agro" },
+      { name: "Construcción", slug: "construccion" },
+      { name: "Moda", slug: "moda" },
+    ];
+  }
+}
+
 export default async function SearchPage({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string; category?: string; condition?: string; sort?: string }>;
 }) {
   const params = await searchParams;
-  const listings = await searchListings(params);
-
-  const categories = [
-    { name: "Todas las categorías", slug: "" },
-    { name: "Tecnología", slug: "tecnologia" },
-    { name: "Hogar", slug: "hogar" },
-    { name: "Vehículos", slug: "vehiculos" },
-    { name: "Campo / Agro", slug: "campo-agro" },
-    { name: "Construcción", slug: "construccion" },
-    { name: "Moda", slug: "moda" },
-  ];
+  const [listings, categories] = await Promise.all([
+    searchListings(params),
+    fetchCategories(),
+  ]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 w-full">
@@ -190,15 +214,7 @@ export default async function SearchPage({
             {/* Category Dropdown */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-foreground">Categoría</label>
-              <select 
-                name="category" 
-                defaultValue={params.category || ""}
-                className="w-full bg-background border border-card-border rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:border-accent-gold"
-              >
-                {categories.map((cat) => (
-                  <option key={cat.slug} value={cat.slug}>{cat.name}</option>
-                ))}
-              </select>
+              <CategorySearchDropdown categories={categories} defaultValue={params.category || ""} />
             </div>
 
             {/* Condition Choice */}
