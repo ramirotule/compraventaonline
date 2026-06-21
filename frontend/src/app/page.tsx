@@ -1,4 +1,5 @@
 import Link from "next/link";
+import HeroCarousel from "@/components/HeroCarousel";
 
 interface MockListing {
   id: string;
@@ -125,26 +126,28 @@ export default async function HomePage() {
   ];
 
   return (
-    <div className="flex flex-col gap-16 pb-16">
-      
-      {/* 1. Hero Search Section */}
-      <section className="relative overflow-hidden py-24 sm:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center relative z-10">
+    <div className="flex flex-col gap-10 pb-16">
+
+      {/* 1. Carousel + Hero Search */}
+      <section className="relative">
+        <HeroCarousel />
+
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center relative z-10 -mt-2 pt-2 pb-2 sm:pb-3">
           
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-gold/10 px-3 py-1 text-xs font-semibold text-accent-gold border border-accent-gold/20 mb-6 glow-gold">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-gold/10 px-3 py-1 text-xs font-semibold text-accent-gold border border-accent-gold/20 mb-4 glow-gold">
             🌾 El Primer Marketplace 100% Pampeano
           </span>
 
-          <h1 className="font-heading text-4xl font-extrabold tracking-tight sm:text-6xl text-foreground max-w-3xl mx-auto leading-[1.1]">
+          <h1 className="font-heading text-3xl font-extrabold tracking-tight sm:text-5xl text-foreground max-w-3xl mx-auto leading-[1.1]">
             Encontrá lo que buscas en <span className="bg-gradient-to-r from-accent-gold to-accent-green bg-clip-text text-transparent">La Pampa</span>
           </h1>
           
-          <p className="mt-6 text-base sm:text-lg text-text-muted max-w-xl mx-auto">
+          <p className="mt-4 text-sm sm:text-base text-text-muted max-w-xl mx-auto">
             Comprá y vendé de forma segura y directa. Conectamos usuarios particulares y comercios de toda la provincia.
           </p>
 
           {/* Search Box Form */}
-          <form action="/search" method="GET" className="mt-10 max-w-2xl mx-auto flex gap-2 p-2 rounded-2xl glass-panel glow-gold">
+          <form action="/search" method="GET" className="mt-6 max-w-2xl mx-auto flex gap-2 p-2 rounded-2xl glass-panel glow-gold">
             <div className="flex-1 flex items-center gap-3 px-3">
               <span className="text-xl">🔍</span>
               <input 
@@ -163,7 +166,7 @@ export default async function HomePage() {
       </section>
 
       {/* 2. Categories Section */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full -mt-2">
         <div className="flex items-end justify-between border-b border-card-border pb-5 mb-8">
           <div>
             <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground">Explorá por Categoría</h2>
