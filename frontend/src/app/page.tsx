@@ -146,22 +146,6 @@ export default async function HomePage() {
             Comprá y vendé de forma segura y directa. Conectamos usuarios particulares y comercios de toda la provincia.
           </p>
 
-          {/* Search Box Form */}
-          <form action="/search" method="GET" className="mt-6 max-w-2xl mx-auto flex gap-2 p-2 rounded-2xl glass-panel glow-gold">
-            <div className="flex-1 flex items-center gap-3 px-3">
-              <span className="text-xl">🔍</span>
-              <input 
-                type="text" 
-                name="q"
-                placeholder="¿Qué estás buscando? (ej. taladro, miel, auto...)" 
-                className="w-full bg-transparent border-none text-foreground placeholder-text-muted/70 focus:outline-none text-sm font-medium"
-              />
-            </div>
-            <button type="submit" className="rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover px-6 py-3 text-xs font-extrabold text-background shadow-md hover:opacity-95 transition-all">
-              Buscar Ofertas
-            </button>
-          </form>
-
         </div>
       </section>
 
