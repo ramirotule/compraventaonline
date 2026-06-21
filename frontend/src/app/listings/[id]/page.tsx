@@ -143,6 +143,11 @@ export default function ListingDetailPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"desc" | "seller">("desc");
   
+  // Payment Simulator States
+  const [isPaid, setIsPaid] = useState(false);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  
   // Interactive Modals
   const [showContactModal, setShowContactModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
@@ -429,21 +434,34 @@ export default function ListingDetailPage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col gap-3 mt-4">
-              
-              {/* WhatsApp direct template */}
-              <a 
-                href={formattedWhatsAppUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full rounded-xl bg-gradient-to-r from-accent-green to-emerald-600 px-6 py-4 text-xs font-extrabold text-white text-center shadow-md hover:scale-[1.01] transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>💬 Contactar por WhatsApp</span>
-              </a>
+              {isPaid ? (
+                <>
+                  <div className="bg-accent-green/10 border border-accent-green/30 text-accent-green rounded-2xl p-4 text-xs font-medium text-center animate-in fade-in duration-300">
+                    ✓ ¡Pago acreditado con éxito! Comunicate con el vendedor por WhatsApp para coordinar el envío.
+                  </div>
+                  {/* WhatsApp direct template */}
+                  <a 
+                    href={formattedWhatsAppUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full rounded-xl bg-gradient-to-r from-accent-green to-emerald-600 px-6 py-4 text-xs font-extrabold text-white text-center shadow-md hover:scale-[1.01] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>💬 Contactar por WhatsApp</span>
+                  </a>
+                </>
+              ) : (
+                <button 
+                  onClick={() => setShowCheckoutModal(true)}
+                  className="w-full rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover px-6 py-4 text-xs font-extrabold text-background text-center shadow-md hover:scale-[1.01] transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>🛒</span> Comprar Producto
+                </button>
+              )}
 
               {/* In-app Message trigger */}
               <button 
                 onClick={() => setShowContactModal(true)}
-                className="w-full rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover px-6 py-4 text-xs font-extrabold text-background text-center shadow-md hover:scale-[1.01] transition-all cursor-pointer"
+                className="w-full rounded-xl bg-card-bg border border-card-border px-6 py-4 text-xs font-bold text-foreground text-center shadow-sm hover:scale-[1.01] transition-all cursor-pointer"
               >
                 Preguntar al Vendedor
               </button>
@@ -579,6 +597,100 @@ export default function ListingDetailPage() {
                 </button>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: SIMULAR PAGO / COMPRAR PRODUCTO */}
+      {showCheckoutModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md rounded-3xl bg-card-bg border border-card-border p-8 shadow-2xl relative animate-in zoom-in-95 duration-200 flex flex-col gap-6">
+            <button 
+              onClick={() => setShowCheckoutModal(false)}
+              className="absolute top-4 right-4 text-text-muted hover:text-foreground text-lg cursor-pointer"
+            >
+              ✕
+            </button>
+            
+            <div className="text-left">
+              <h3 className="font-heading text-lg font-extrabold text-foreground">Completar Compra</h3>
+              <p className="text-text-muted text-xs mt-1">
+                Simulá el pago seguro del producto para habilitar el contacto por WhatsApp.
+              </p>
+            </div>
+
+            {/* Product Summary */}
+            <div className="rounded-2xl bg-background border border-card-border p-4 flex items-center gap-3 text-xs">
+              <div className="h-12 w-12 rounded-lg overflow-hidden border border-card-border shrink-0">
+                <img src={listing.product.images[0]} alt={listing.product.name} className="h-full w-full object-cover" />
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <h4 className="font-bold text-foreground truncate">{listing.product.name}</h4>
+                <span className="text-text-muted text-[10px] block">Vendedor: {listing.seller.name}</span>
+              </div>
+              <div className="text-right shrink-0">
+                <span className="font-extrabold text-foreground">${listing.price.toLocaleString("es-AR")}</span>
+              </div>
+            </div>
+
+            {/* Payment Details Form */}
+            <div className="flex flex-col gap-4 text-left">
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs font-bold text-foreground">Medio de Pago</span>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="border border-accent-gold bg-accent-gold/5 rounded-xl p-3 flex flex-col gap-1 cursor-pointer select-none text-xs">
+                    <span className="font-bold text-accent-gold">💳 Tarjeta</span>
+                    <span className="text-[10px] text-text-muted">Crédito o Débito</span>
+                  </div>
+                  <div className="border border-card-border hover:border-accent-gold/40 rounded-xl p-3 flex flex-col gap-1 cursor-pointer select-none opacity-50 text-xs">
+                    <span className="font-bold text-foreground">🏦 Transferencia</span>
+                    <span className="text-[10px] text-text-muted">CBU / Alias</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold text-foreground">Número de Tarjeta (Simulado)</label>
+                <input 
+                  type="text" 
+                  disabled
+                  value="••••  ••••  ••••  5829" 
+                  className="w-full bg-background/50 border border-card-border rounded-xl px-4 py-3 text-xs text-foreground cursor-not-allowed"
+                />
+              </div>
+
+              <div className="flex justify-between items-center border-t border-card-border/30 pt-4 mt-2">
+                <span className="text-xs text-text-muted">Total a Pagar:</span>
+                <span className="font-heading text-lg font-extrabold text-accent-gold">
+                  ${listing.price.toLocaleString("es-AR")}
+                </span>
+              </div>
+            </div>
+
+            <button 
+              onClick={async () => {
+                setPaymentLoading(true);
+                setTimeout(() => {
+                  setPaymentLoading(false);
+                  setIsPaid(true);
+                  setShowCheckoutModal(false);
+                }, 1500);
+              }}
+              disabled={paymentLoading}
+              className="w-full rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover py-4 text-xs font-extrabold text-background shadow-md hover:scale-[1.01] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            >
+              {paymentLoading ? (
+                <>
+                  <svg className="animate-spin h-4 w-4 text-background" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Procesando pago...
+                </>
+              ) : (
+                `Pagar $${listing.price.toLocaleString("es-AR")}`
+              )}
+            </button>
           </div>
         </div>
       )}
