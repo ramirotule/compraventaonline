@@ -68,15 +68,20 @@ export default function RootLayout({
               <Link href="/search" className="text-sm font-semibold text-foreground/80 hover:text-accent-gold transition-colors">
                 Buscar
               </Link>
-              <Link href="/dashboard" className="text-sm font-semibold text-foreground/80 hover:text-accent-gold transition-colors">
-                Panel Vendedor
+              <Link href="/support" className="text-sm font-semibold text-foreground/80 hover:text-accent-gold transition-colors">
+                Ayuda
+              </Link>
+              <Link href="/envios" className="text-sm font-semibold text-foreground/80 hover:text-accent-gold transition-colors">
+                Envíos & Logística
               </Link>
             </nav>
 
-            {/* User Session Bar */}
-            <div className="flex items-center gap-4">
-              <ThemeToggle />
+            {/* User Session Bar + theme (toggle al extremo derecho) */}
+            <div className="flex items-center gap-3 sm:gap-4">
               <HeaderSessionBar />
+              <div className="ml-1 pl-3 sm:pl-4 border-l border-card-border/40">
+                <ThemeToggle />
+              </div>
             </div>
 
           </div>
@@ -108,6 +113,9 @@ export default function RootLayout({
                 </Link>
                 <Link href="/support" className="hover:text-accent-gold transition-colors">
                   Soporte
+                </Link>
+                <Link href="/envios" className="hover:text-accent-gold transition-colors">
+                  Envíos & Logística
                 </Link>
               </div>
             </div>
