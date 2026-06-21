@@ -184,7 +184,8 @@ export default function DestacadosPage() {
           {listings.map((item) => {
             const isPremium = item.featuredPlan === "PREMIUM";
             return (
-              <div 
+              <Link 
+                href={`/listings/${item.id}`}
                 key={item.id}
                 className={`relative rounded-3xl border bg-card-bg-solid overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${
                   isPremium 
@@ -253,8 +254,7 @@ export default function DestacadosPage() {
                         ${item.price.toLocaleString("es-AR")}
                       </span>
                     </div>
-                    <Link 
-                      href={`/listings/${item.id}`}
+                    <span 
                       className={`rounded-xl px-4 py-2 text-xs font-bold transition-all ${
                         isPremium 
                           ? "bg-gradient-to-r from-accent-gold to-accent-gold-hover text-background shadow-md hover:scale-[1.02] active:scale-[0.98]"
@@ -262,11 +262,11 @@ export default function DestacadosPage() {
                       }`}
                     >
                       Ver Detalle
-                    </Link>
+                    </span>
                   </div>
                 </div>
 
-              </div>
+              </Link>
             );
           })}
         </div>

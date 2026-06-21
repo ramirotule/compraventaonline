@@ -74,11 +74,11 @@ export default function RootLayout({
               <Link href="/search" className="text-sm font-semibold text-foreground/80 hover:text-accent-gold transition-colors">
                 Buscar
               </Link>
-              <Link href="/support" className="text-sm font-semibold text-foreground/80 hover:text-accent-gold transition-colors">
-                Ayuda
-              </Link>
               <Link href="/envios" className="text-sm font-semibold text-foreground/80 hover:text-accent-gold transition-colors">
                 Envíos & Logística
+              </Link>
+              <Link href="/support" className="text-sm font-semibold text-foreground/80 hover:text-accent-gold transition-colors">
+                Ayuda
               </Link>
             </nav>
 
