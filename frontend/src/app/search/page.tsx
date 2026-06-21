@@ -248,6 +248,15 @@ export default async function SearchPage({
             <button type="submit" className="w-full rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover py-3 text-xs font-extrabold text-background shadow-md hover:opacity-95 transition-all mt-2">
               Aplicar Filtros
             </button>
+
+            {(params.q || params.category || params.condition || params.sort) && (
+              <Link 
+                href="/search" 
+                className="w-full text-center rounded-xl border border-card-border py-2.5 text-xs font-bold text-foreground hover:bg-card-border/50 hover:text-accent-gold transition-all"
+              >
+                Limpiar Filtros
+              </Link>
+            )}
           </form>
         </aside>
 
