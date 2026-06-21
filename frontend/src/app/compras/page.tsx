@@ -110,7 +110,7 @@ export default function PurchasesPage() {
       <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
         
         {/* Tab Selector */}
-        <div className="flex bg-card-bg border border-card-border p-1 rounded-xl w-fit self-start">
+        <div className="flex bg-card-bg border border-card-border p-1 rounded-xl overflow-x-auto max-w-full scrollbar-none whitespace-nowrap self-start">
           {[
             { id: "TODAS", label: "Todas" },
             { id: "EN_CAMINO", label: "En camino" },

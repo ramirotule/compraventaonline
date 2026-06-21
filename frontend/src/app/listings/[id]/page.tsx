@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import CustomDropdown from "@/components/CustomDropdown";
 
 interface Listing {
   id: string;
@@ -567,17 +568,18 @@ export default function ListingDetailPage() {
               <form onSubmit={handleReportSubmit} className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-bold text-foreground">Motivo de la Denuncia</label>
-                  <select 
-                    value={reportReason}
-                    onChange={(e) => setReportReason(e.target.value)}
-                    className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
-                  >
-                    <option value="FRAUD">Sospecha de estafa o fraude</option>
-                    <option value="ILLEGAL">Producto prohibido / ilegal</option>
-                    <option value="OFFENSIVE">Contenido ofensivo o violento</option>
-                    <option value="FAKE">Artículo falso o engañoso</option>
-                    <option value="OTHER">Otro motivo</option>
-                  </select>
+                  <CustomDropdown
+                    name="reason"
+                    defaultValue={reportReason}
+                    onChange={setReportReason}
+                    options={[
+                      { name: "Sospecha de estafa o fraude", value: "FRAUD" },
+                      { name: "Producto prohibido / ilegal", value: "ILLEGAL" },
+                      { name: "Contenido ofensivo o violento", value: "OFFENSIVE" },
+                      { name: "Artículo falso o engañoso", value: "FAKE" },
+                      { name: "Otro motivo", value: "OTHER" },
+                    ]}
+                  />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-bold text-foreground">Detalles adicionales</label>

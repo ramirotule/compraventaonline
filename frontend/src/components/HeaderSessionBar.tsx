@@ -86,9 +86,9 @@ export default function HeaderSessionBar() {
   }
 
   return (
-    <div className="flex items-center gap-4">
-      {/* Mobile search indicator */}
-      <Link href="/search" className="p-2 text-text-muted hover:text-foreground transition-colors md:hidden">
+    <div className="flex items-center gap-3">
+      {/* Mobile search indicator — hidden because search is always visible in the header */}
+      <Link href="/search" className="hidden p-2 text-text-muted hover:text-foreground transition-colors md:hidden">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -98,7 +98,7 @@ export default function HeaderSessionBar() {
       {/* CTA Vender */}
       <Link
         href="/dashboard?tab=publish"
-        className="sell-cta-pulse hidden sm:inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover px-5 py-2.5 text-xs font-extrabold uppercase tracking-wide text-background border border-accent-gold/50 hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] transition-all"
+        className="sell-cta-pulse hidden sm:inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent-green to-accent-green px-5 py-2 text-xs font-extrabold uppercase tracking-wide text-background border border-accent-green/30 hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] transition-all"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
@@ -123,10 +123,10 @@ export default function HeaderSessionBar() {
               <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-accent-gold to-accent-gold-hover text-background font-bold text-xs uppercase shadow-sm">
                 {profile ? profile.name.charAt(0) : "U"}
               </div>
-              <span className="hidden md:inline-block text-xs font-bold text-foreground max-w-[130px] truncate">
+              <span className="hidden md:inline-block text-xs font-bold text-foreground max-w-[120px] truncate">
                 {profile ? `Bienvenido, ${profile.name}` : "Cargando..."}
               </span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-text-muted">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-text-muted hidden md:block">
                 <path d="m6 9 6 6 6-6"/>
               </svg>
             </button>
@@ -135,7 +135,7 @@ export default function HeaderSessionBar() {
             {showUserMenu && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
-                <div className="absolute right-0 mt-3 w-52 rounded-2xl bg-card-bg-solid border border-card-border p-2.5 shadow-2xl z-50 flex flex-col gap-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="fixed md:absolute right-4 md:right-0 top-[125px] md:top-auto md:mt-3 w-52 rounded-2xl bg-card-bg-solid border border-card-border p-2.5 shadow-2xl z-50 flex flex-col gap-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="px-3 py-1 border-b border-card-border/30 mb-1">
                     <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Mi Cuenta</p>
                   </div>
@@ -213,7 +213,7 @@ export default function HeaderSessionBar() {
             {showCart && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowCart(false)} />
-                <div className="absolute right-0 mt-3 w-80 rounded-2xl bg-card-bg-solid border border-card-border p-4 shadow-2xl z-50 flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="fixed md:absolute right-4 left-4 md:right-0 md:left-auto top-[125px] md:top-auto md:mt-3 w-auto md:w-80 rounded-2xl bg-card-bg-solid border border-card-border p-4 shadow-2xl z-50 flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="flex items-center justify-between border-b border-card-border/50 pb-2">
                     <h4 className="font-heading text-xs font-extrabold text-foreground uppercase tracking-wider">Mi Carrito</h4>
                     <span className="text-[10px] font-bold text-text-muted">{totalItems} artículos</span>

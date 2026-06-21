@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CategorySearchDropdown from "../../components/CategorySearchDropdown";
+import CustomDropdown from "../../components/CustomDropdown";
 
 interface MockListing {
   id: string;
@@ -220,29 +221,29 @@ export default async function SearchPage({
             {/* Condition Choice */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-foreground">Condición</label>
-              <select 
+              <CustomDropdown 
                 name="condition" 
                 defaultValue={params.condition || ""}
-                className="w-full bg-background border border-card-border rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:border-accent-gold"
-              >
-                <option value="">Cualquier estado</option>
-                <option value="NEW">Nuevo</option>
-                <option value="USED">Usado</option>
-              </select>
+                options={[
+                  { name: "Cualquier estado", value: "" },
+                  { name: "Nuevo", value: "NEW" },
+                  { name: "Usado", value: "USED" },
+                ]}
+              />
             </div>
 
             {/* Sort Choice */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-foreground">Ordenar Por</label>
-              <select 
+              <CustomDropdown 
                 name="sort" 
                 defaultValue={params.sort || ""}
-                className="w-full bg-background border border-card-border rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:border-accent-gold"
-              >
-                <option value="">Relevancia</option>
-                <option value="price_asc">Menor precio</option>
-                <option value="price_desc">Mayor precio</option>
-              </select>
+                options={[
+                  { name: "Relevancia", value: "" },
+                  { name: "Menor precio", value: "price_asc" },
+                  { name: "Mayor precio", value: "price_desc" },
+                ]}
+              />
             </div>
 
             <button type="submit" className="w-full rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover py-3 text-xs font-extrabold text-background shadow-md hover:opacity-95 transition-all mt-2">

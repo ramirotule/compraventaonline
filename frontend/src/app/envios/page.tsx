@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import CustomDropdown from "@/components/CustomDropdown";
 
 export default function ShippingPage() {
   const [name, setName] = useState("");
@@ -181,17 +182,18 @@ export default function ShippingPage() {
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-bold text-foreground">Medio de Transporte Principal</label>
-              <select 
-                value={vehicle}
-                onChange={(e) => setVehicle(e.target.value)}
-                className="w-full bg-background border border-card-border rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-accent-gold"
-              >
-                <option value="moto">Motocicleta / Scooter</option>
-                <option value="auto">Automóvil / Utilitario</option>
-                <option value="flete">Flete / Camioneta de Carga</option>
-                <option value="bici">Bicicleta</option>
-                <option value="otro">Múltiples vehículos / Otro servicio</option>
-              </select>
+              <CustomDropdown
+                name="vehicle"
+                defaultValue={vehicle}
+                onChange={setVehicle}
+                options={[
+                  { name: "Motocicleta / Scooter", value: "moto" },
+                  { name: "Automóvil / Utilitario", value: "auto" },
+                  { name: "Flete / Camioneta de Carga", value: "flete" },
+                  { name: "Bicicleta", value: "bici" },
+                  { name: "Múltiples vehículos / Otro servicio", value: "otro" },
+                ]}
+              />
             </div>
 
             <div className="flex flex-col gap-2">

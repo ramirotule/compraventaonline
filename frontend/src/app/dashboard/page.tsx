@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import CustomDropdown from "@/components/CustomDropdown";
 
 interface Listing {
   id: string;
@@ -495,14 +496,15 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-bold text-foreground">Condición</label>
-                  <select 
-                    value={condition}
-                    onChange={(e) => setCondition(e.target.value)}
-                    className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
-                  >
-                    <option value="NEW">Nuevo</option>
-                    <option value="USED">Usado</option>
-                  </select>
+                  <CustomDropdown
+                    name="condition"
+                    defaultValue={condition}
+                    onChange={setCondition}
+                    options={[
+                      { name: "Nuevo", value: "NEW" },
+                      { name: "Usado", value: "USED" },
+                    ]}
+                  />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-bold text-foreground">Stock Inicial</label>
@@ -517,29 +519,27 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-bold text-foreground">Categoría</label>
-                  <select 
-                    value={categoryId}
-                    onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
-                  >
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
-                    ))}
-                  </select>
+                  <CustomDropdown
+                    name="categoryId"
+                    defaultValue={categoryId}
+                    onChange={setCategoryId}
+                    options={categories.map((cat) => ({ name: cat.name, value: cat.id }))}
+                  />
                 </div>
               </div>
 
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold text-foreground">Plan de Destacado (Monetización)</label>
-                <select 
-                  value={featuredPlan}
-                  onChange={(e) => setFeaturedPlan(e.target.value)}
-                  className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
-                >
-                  <option value="FREE">Plan Gratuito (FREE)</option>
-                  <option value="FEATURED">Plan Destacado (FEATURED)</option>
-                  <option value="PREMIUM">Plan Premium (PREMIUM)</option>
-                </select>
+                <CustomDropdown
+                  name="featuredPlan"
+                  defaultValue={featuredPlan}
+                  onChange={setFeaturedPlan}
+                  options={[
+                    { name: "Plan Gratuito (FREE)", value: "FREE" },
+                    { name: "Plan Destacado (FEATURED)", value: "FEATURED" },
+                    { name: "Plan Premium (PREMIUM)", value: "PREMIUM" },
+                  ]}
+                />
               </div>
 
               <button 
@@ -740,15 +740,15 @@ export default function DashboardPage() {
                           No tenés publicaciones aprobadas y activas para destacar.
                         </p>
                       ) : (
-                        <select
-                          value={selectedListingForReward}
-                          onChange={(e) => setSelectedListingForReward(e.target.value)}
-                          className="w-full bg-background border border-card-border rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:border-accent-gold"
-                        >
-                          {myListings.filter(l => l.status === "APPROVED").map((l) => (
-                            <option key={l.id} value={l.id}>{l.product.name} (${l.price.toLocaleString("es-AR")})</option>
-                          ))}
-                        </select>
+                        <CustomDropdown
+                          name="rewardListing"
+                          defaultValue={selectedListingForReward}
+                          onChange={setSelectedListingForReward}
+                          options={myListings.filter(l => l.status === "APPROVED").map((l) => ({
+                            name: `${l.product.name} ($${l.price.toLocaleString("es-AR")})`,
+                            value: l.id
+                          }))}
+                        />
                       )}
                     </div>
 

@@ -5,6 +5,15 @@ import Link from "next/link";
 
 const SLIDES = [
   {
+    id: "electronics",
+    image:
+      "https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=1600&auto=format&fit=crop",
+    eyebrow: "Tecnología",
+    title: "Lo último en celulares, notebooks y gadgets",
+    cta: "Ver tecnología",
+    href: "/search?category=tecnologia",
+  },
+  {
     id: "agro",
     image:
       "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=1600&auto=format&fit=crop",
