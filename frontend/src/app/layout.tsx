@@ -61,12 +61,19 @@ export default function RootLayout({
             </Link>
 
             {/* Nav Menu */}
-            <nav className="hidden md:flex items-center gap-8">
+            <nav className="hidden md:flex items-center gap-6">
               <Link href="/" className="text-sm font-semibold text-foreground/80 hover:text-accent-gold transition-colors">
                 Inicio
               </Link>
+              <Link href="/destacados" className="text-sm font-semibold text-foreground/80 hover:text-accent-gold transition-colors flex items-center gap-1">
+                <span className="text-accent-gold animate-pulse text-xs">⭐</span>
+                Destacados
+              </Link>
               <Link href="/search" className="text-sm font-semibold text-foreground/80 hover:text-accent-gold transition-colors">
                 Buscar
+              </Link>
+              <Link href="/dashboard" className="text-sm font-semibold text-foreground/80 hover:text-accent-gold transition-colors">
+                Panel Vendedor
               </Link>
               <Link href="/support" className="text-sm font-semibold text-foreground/80 hover:text-accent-gold transition-colors">
                 Ayuda
