@@ -57,7 +57,7 @@ export default function TermsPage() {
               <button
                 key={section.id}
                 onClick={() => scrollToSection(section.id)}
-                className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`w-full text-left px-3 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                   activeSection === section.id
                     ? "bg-accent-gold/15 text-accent-gold"
                     : "text-text-muted hover:text-foreground hover:bg-card-border/20"
@@ -70,7 +70,7 @@ export default function TermsPage() {
         </aside>
 
         {/* Legal Text Content */}
-        <div className="flex-1 rounded-2xl border border-card-border bg-card-bg-solid p-6 md:p-8 shadow-xl flex flex-col gap-8 text-xs text-text-muted leading-relaxed">
+        <div className="flex-1 rounded-2xl border border-card-border bg-card-bg-solid p-6 md:p-8 shadow-xl flex flex-col gap-8 text-sm text-text-muted leading-relaxed">
           
           {/* Section: Resumen */}
           <section id="resumen" className="flex flex-col gap-3 scroll-mt-24">
@@ -108,7 +108,7 @@ export default function TermsPage() {
 
           {/* Section 1 */}
           <section id="descripcion" className="flex flex-col gap-3 scroll-mt-24">
-            <h2 className="font-heading text-sm font-extrabold text-foreground border-b border-card-border/30 pb-2">
+            <h2 className="font-heading text-base font-extrabold text-foreground border-b border-card-border/30 pb-2">
               1- CompraVentaOnline
             </h2>
             <p>
@@ -121,7 +121,7 @@ export default function TermsPage() {
 
           {/* Section 2 */}
           <section id="terminos" className="flex flex-col gap-3 scroll-mt-24">
-            <h2 className="font-heading text-sm font-extrabold text-foreground border-b border-card-border/30 pb-2">
+            <h2 className="font-heading text-base font-extrabold text-foreground border-b border-card-border/30 pb-2">
               2- Términos y Condiciones
             </h2>
             <p>
@@ -140,7 +140,7 @@ export default function TermsPage() {
 
           {/* Section 3 */}
           <section id="capacidad" className="flex flex-col gap-3 scroll-mt-24">
-            <h2 className="font-heading text-sm font-extrabold text-foreground border-b border-card-border/30 pb-2">
+            <h2 className="font-heading text-base font-extrabold text-foreground border-b border-card-border/30 pb-2">
               3- Capacidad
             </h2>
             <p>
@@ -153,7 +153,7 @@ export default function TermsPage() {
 
           {/* Section 4 */}
           <section id="registro" className="flex flex-col gap-3 scroll-mt-24">
-            <h2 className="font-heading text-sm font-extrabold text-foreground border-b border-card-border/30 pb-2">
+            <h2 className="font-heading text-base font-extrabold text-foreground border-b border-card-border/30 pb-2">
               4- Registro y Cuenta
             </h2>
             <p>
@@ -175,7 +175,7 @@ export default function TermsPage() {
 
           {/* Section 5 */}
           <section id="privacidad" className="flex flex-col gap-3 scroll-mt-24">
-            <h2 className="font-heading text-sm font-extrabold text-foreground border-b border-card-border/30 pb-2">
+            <h2 className="font-heading text-base font-extrabold text-foreground border-b border-card-border/30 pb-2">
               5- Privacidad de datos
             </h2>
             <p>
@@ -185,7 +185,7 @@ export default function TermsPage() {
 
           {/* Section 6 */}
           <section id="comercial" className="flex flex-col gap-3 scroll-mt-24">
-            <h2 className="font-heading text-sm font-extrabold text-foreground border-b border-card-border/30 pb-2">
+            <h2 className="font-heading text-base font-extrabold text-foreground border-b border-card-border/30 pb-2">
               6- Información Comercial
             </h2>
             <p>
@@ -198,7 +198,7 @@ export default function TermsPage() {
 
           {/* Section 7 */}
           <section id="sanciones" className="flex flex-col gap-3 scroll-mt-24">
-            <h2 className="font-heading text-sm font-extrabold text-foreground border-b border-card-border/30 pb-2">
+            <h2 className="font-heading text-base font-extrabold text-foreground border-b border-card-border/30 pb-2">
               7- Sanciones
             </h2>
             <p>
@@ -208,7 +208,7 @@ export default function TermsPage() {
 
           {/* Section 8 */}
           <section id="responsabilidad" className="flex flex-col gap-3 scroll-mt-24">
-            <h2 className="font-heading text-sm font-extrabold text-foreground border-b border-card-border/30 pb-2">
+            <h2 className="font-heading text-base font-extrabold text-foreground border-b border-card-border/30 pb-2">
               8- Responsabilidad
             </h2>
             <p>
@@ -221,7 +221,7 @@ export default function TermsPage() {
 
           {/* Section 9 */}
           <section id="tarifas" className="flex flex-col gap-3 scroll-mt-24">
-            <h2 className="font-heading text-sm font-extrabold text-foreground border-b border-card-border/30 pb-2">
+            <h2 className="font-heading text-base font-extrabold text-foreground border-b border-card-border/30 pb-2">
               9- Tarifas
             </h2>
             <p>
@@ -237,7 +237,7 @@ export default function TermsPage() {
 
           {/* Section 10 */}
           <section id="intelectual" className="flex flex-col gap-3 scroll-mt-24">
-            <h2 className="font-heading text-sm font-extrabold text-foreground border-b border-card-border/30 pb-2">
+            <h2 className="font-heading text-base font-extrabold text-foreground border-b border-card-border/30 pb-2">
               10- Propiedad Intelectual
             </h2>
             <p>
@@ -253,7 +253,7 @@ export default function TermsPage() {
 
           {/* Section 11 */}
           <section id="indemnidad" className="flex flex-col gap-3 scroll-mt-24">
-            <h2 className="font-heading text-sm font-extrabold text-foreground border-b border-card-border/30 pb-2">
+            <h2 className="font-heading text-base font-extrabold text-foreground border-b border-card-border/30 pb-2">
               11- Indemnidad
             </h2>
             <p>
@@ -263,7 +263,7 @@ export default function TermsPage() {
 
           {/* Section 12 */}
           <section id="automatizado" className="flex flex-col gap-3 scroll-mt-24">
-            <h2 className="font-heading text-sm font-extrabold text-foreground border-b border-card-border/30 pb-2">
+            <h2 className="font-heading text-base font-extrabold text-foreground border-b border-card-border/30 pb-2">
               12- Uso Automatizado del Sitio y Acceso a la Información
             </h2>
             <p>
@@ -282,7 +282,7 @@ export default function TermsPage() {
 
           {/* Section 13 */}
           <section id="anexos" className="flex flex-col gap-3 scroll-mt-24">
-            <h2 className="font-heading text-sm font-extrabold text-foreground border-b border-card-border/30 pb-2">
+            <h2 className="font-heading text-base font-extrabold text-foreground border-b border-card-border/30 pb-2">
               13- Anexos
             </h2>
             <p>
@@ -298,7 +298,7 @@ export default function TermsPage() {
 
           {/* Section 14 */}
           <section id="jurisdiccion" className="flex flex-col gap-3 scroll-mt-24">
-            <h2 className="font-heading text-sm font-extrabold text-foreground border-b border-card-border/30 pb-2">
+            <h2 className="font-heading text-base font-extrabold text-foreground border-b border-card-border/30 pb-2">
               14- Jurisdicción y Ley Aplicable
             </h2>
             <p>
@@ -312,7 +312,7 @@ export default function TermsPage() {
             </p>
           </section>
 
-          <div className="border-t border-card-border/30 pt-6 mt-4 flex items-center justify-between text-[10px]">
+          <div className="border-t border-card-border/30 pt-6 mt-4 flex items-center justify-between text-xs">
             <span>© 1999-2026 CompraVentaOnline S.R.L. Todos los derechos reservados.</span>
             <span>Santa Rosa, La Pampa, Argentina</span>
           </div>

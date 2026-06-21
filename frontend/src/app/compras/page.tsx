@@ -101,7 +101,7 @@ export default function PurchasesPage() {
         <h1 className="font-heading text-2xl font-extrabold text-foreground">
           Mis compras
         </h1>
-        <p className="text-text-muted text-xs">
+        <p className="text-text-muted text-sm">
           Hacé el seguimiento de tus pedidos, contactá a tus vendedores o calificá tus transacciones realizadas en La Pampa.
         </p>
       </div>
@@ -120,7 +120,7 @@ export default function PurchasesPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${
                 activeTab === tab.id
                   ? "bg-accent-gold text-background shadow-sm"
                   : "text-text-muted hover:text-foreground"
@@ -133,7 +133,7 @@ export default function PurchasesPage() {
 
         {/* Search input */}
         <div className="relative flex-1 max-w-md">
-          <span className="absolute inset-y-0 left-3 flex items-center text-xs text-text-muted select-none">
+          <span className="absolute inset-y-0 left-3 flex items-center text-sm text-text-muted select-none">
             🔍
           </span>
           <input 
@@ -141,7 +141,7 @@ export default function PurchasesPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar compras por producto, marca o vendedor..."
-            className="w-full bg-card-bg-solid border border-card-border rounded-xl pl-9 pr-4 py-2.5 text-xs text-foreground focus:outline-none focus:border-accent-gold"
+            className="w-full bg-card-bg-solid border border-card-border rounded-xl pl-9 pr-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-accent-gold"
           />
         </div>
 
@@ -153,12 +153,12 @@ export default function PurchasesPage() {
           <div className="py-20 text-center border border-dashed border-card-border rounded-3xl flex flex-col items-center gap-2 bg-card-bg-solid">
             <span className="text-4xl">🛍️</span>
             <h3 className="font-heading text-sm font-bold text-foreground mt-2">No encontramos compras</h3>
-            <p className="text-text-muted text-xs">
+            <p className="text-text-muted text-sm">
               No tenés compras registradas que coincidan con la búsqueda actual.
             </p>
             <Link 
               href="/search" 
-              className="mt-4 rounded-xl bg-accent-gold px-5 py-2.5 text-xs font-extrabold text-background shadow-md hover:opacity-90 transition-all"
+              className="mt-4 rounded-xl bg-accent-gold px-5 py-2.5 text-sm font-extrabold text-background shadow-md hover:opacity-90 transition-all"
             >
               Explorar productos
             </Link>
@@ -175,7 +175,7 @@ export default function PurchasesPage() {
                 className="rounded-2xl border border-card-border bg-card-bg-solid p-5 flex flex-col gap-4 shadow-sm hover:border-card-border/80 transition-colors"
               >
                 {/* Card Top: Date & Order info */}
-                <div className="flex justify-between items-center border-b border-card-border/30 pb-3 text-[10px] text-text-muted">
+                <div className="flex justify-between items-center border-b border-card-border/30 pb-3 text-xs text-text-muted">
                   <span>Comprado el {purchase.date}</span>
                   <span className="font-mono">ID Compra: #{purchase.id.toUpperCase()}</span>
                 </div>
@@ -195,7 +195,7 @@ export default function PurchasesPage() {
                     <div className="flex flex-col gap-1 text-left">
                       
                       {/* Status indicator */}
-                      <span className={`inline-flex items-center gap-1.5 text-[9px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full w-fit ${
+                      <span className={`inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide px-2.5 py-0.5 rounded-full w-fit ${
                         isDelivered 
                           ? "bg-accent-green/10 text-accent-green" 
                           : isPending 
@@ -208,13 +208,13 @@ export default function PurchasesPage() {
                         {purchase.statusText}
                       </span>
 
-                      <h3 className="font-heading text-sm font-bold text-foreground leading-tight mt-1">
+                      <h3 className="font-heading text-base font-bold text-foreground leading-tight mt-1">
                         {purchase.productName}
                       </h3>
-                      <p className="text-[10px] text-text-muted">
+                      <p className="text-xs text-text-muted">
                         Marca: {purchase.brand} | Cantidad: {purchase.quantity}
                       </p>
-                      <p className="text-[10px] text-text-muted mt-0.5">
+                      <p className="text-xs text-text-muted mt-0.5">
                         Vendedor: <span className="font-bold text-foreground/80">{purchase.sellerName}</span>
                       </p>
                     </div>
@@ -222,8 +222,8 @@ export default function PurchasesPage() {
 
                   {/* Middle Column: Price details */}
                   <div className="flex flex-col items-start md:items-end shrink-0">
-                    <span className="text-[9px] text-text-muted uppercase font-semibold">Total abonado</span>
-                    <span className="font-heading text-base font-extrabold text-foreground mt-0.5">
+                    <span className="text-xs text-text-muted uppercase font-semibold">Total abonado</span>
+                    <span className="font-heading text-lg font-extrabold text-foreground mt-0.5">
                       ${(purchase.price * purchase.quantity).toLocaleString("es-AR")}
                     </span>
                   </div>
@@ -273,12 +273,12 @@ export default function PurchasesPage() {
               <h3 className="font-heading text-lg font-extrabold text-foreground">
                 Coordinación del Envió y Pago
               </h3>
-              <p className="text-text-muted text-xs leading-relaxed">
+              <p className="text-text-muted text-sm leading-relaxed">
                 Comunicate de forma directa con el vendedor en La Pampa para acordar el lugar de entrega y el medio de cobro.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-card-border bg-background p-4 flex flex-col gap-3 text-xs">
+            <div className="rounded-2xl border border-card-border bg-background p-4 flex flex-col gap-3 text-sm">
               <div className="flex justify-between border-b border-card-border/30 pb-2">
                 <span className="text-text-muted">Vendedor:</span>
                 <strong className="text-foreground">{selectedPurchase.sellerName}</strong>

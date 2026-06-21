@@ -25,7 +25,7 @@ export default function SupportPage() {
     {
       category: "vendedores",
       question: "¿Cómo puedo empezar a vender mis productos?",
-      answer: "Es muy fácil: 1) Registrate en la plataforma ingresando tu nombre, email, contraseña y DNI/CUIL o CUIT. 2) Se creará automáticamente tu Perfil Comercial. 3) Hacé click en el botón '+ Publicar' de la barra superior. 4) Completá el formulario con el nombre del producto, descripción, marca, precio, stock, categoría y plan de destacado, y dale a publicar. Tu artículo pasará una moderación de contenido automática y estará disponible al instante en el buscador."
+      answer: "Es muy fácil: 1) Registrate en la plataforma ingresando tu nombre, email, contraseña y DNI/CUIL o CUIT. 2) Se creará automáticamente tu Perfil Comercial. 3) Hacé click en el botón 'Vender' de la barra superior. 4) Completá el formulario con el nombre del producto, descripción, marca, precio, stock, categoría y plan de destacado, y dale a publicar. Tu artículo pasará una moderación de contenido automática y estará disponible al instante en el buscador."
     },
     {
       category: "reputacion",
@@ -77,7 +77,7 @@ export default function SupportPage() {
       <div className="text-center max-w-3xl mx-auto flex flex-col gap-3">
         <span className="text-5xl">🌾</span>
         <h1 className="font-heading text-4xl font-extrabold text-foreground mt-2">Centro de Soporte y Ayuda</h1>
-        <p className="text-text-muted text-sm leading-relaxed">
+        <p className="text-text-muted text-base leading-relaxed">
           Encontrá respuestas a las consultas más frecuentes sobre cómo comprar, vender y gestionar tus publicaciones en el marketplace de La Pampa.
         </p>
       </div>
@@ -100,7 +100,7 @@ export default function SupportPage() {
                   setActiveTab(tab.id as any);
                   setOpenFAQIndex(null);
                 }}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                   activeTab === tab.id 
                     ? "bg-accent-gold text-background shadow-md" 
                     : "text-foreground/80 hover:bg-card-border/30"
@@ -121,13 +121,13 @@ export default function SupportPage() {
                 >
                   <button
                     onClick={() => setOpenFAQIndex(isOpen ? null : index)}
-                    className="w-full text-left px-6 py-4 flex items-center justify-between gap-4 font-heading font-semibold text-xs text-foreground hover:text-accent-gold transition-colors cursor-pointer select-none"
+                    className="w-full text-left px-6 py-4 flex items-center justify-between gap-4 font-heading font-semibold text-sm text-foreground hover:text-accent-gold transition-colors cursor-pointer select-none"
                   >
                     <span>{faq.question}</span>
                     <span className="text-accent-gold shrink-0 text-lg">{isOpen ? "−" : "+"}</span>
                   </button>
                   {isOpen && (
-                    <div className="px-6 pb-5 text-xs text-text-muted leading-relaxed border-t border-card-border/30 pt-3">
+                    <div className="px-6 pb-5 text-sm text-text-muted leading-relaxed border-t border-card-border/30 pt-3">
                       {faq.answer}
                     </div>
                   )}
@@ -140,64 +140,64 @@ export default function SupportPage() {
         {/* Contact Form Panel */}
         <div className="rounded-2xl border border-card-border bg-card-bg-solid p-6 shadow-xl flex flex-col gap-6">
           <div>
-            <h3 className="font-heading text-sm font-extrabold text-foreground uppercase tracking-wider">¿Tenés otra duda?</h3>
-            <p className="text-text-muted text-[10px] mt-1 leading-relaxed">
+            <h3 className="font-heading text-base font-extrabold text-foreground uppercase tracking-wider">¿Tenés otra duda?</h3>
+            <p className="text-text-muted text-xs mt-1 leading-relaxed">
               Comunicate con el equipo técnico de CompraVentaOnline y te responderemos a la brevedad.
             </p>
           </div>
 
           {submitted ? (
-            <div className="bg-accent-green/10 border border-accent-green/30 text-accent-green rounded-xl p-4 text-xs font-medium text-center animate-in fade-in zoom-in-95 duration-200">
+            <div className="bg-accent-green/10 border border-accent-green/30 text-accent-green rounded-xl p-4 text-sm font-medium text-center animate-in fade-in zoom-in-95 duration-200">
               ✓ ¡Mensaje recibido! Nos pondremos en contacto con vos lo antes posible.
             </div>
           ) : (
             <form onSubmit={handleSubmitTicket} className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-foreground">Nombre Completo</label>
+                <label className="text-sm font-bold text-foreground">Nombre Completo</label>
                 <input 
                   type="text" 
                   required
                   value={contactName}
                   onChange={(e) => setContactName(e.target.value)}
                   placeholder="Ej. Juan Pérez" 
-                  className="w-full bg-background border border-card-border rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:border-accent-gold"
+                  className="w-full bg-background border border-card-border rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-accent-gold"
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-foreground">Correo Electrónico</label>
+                <label className="text-sm font-bold text-foreground">Correo Electrónico</label>
                 <input 
                   type="email" 
                   required
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
                   placeholder="nombre@correo.com" 
-                  className="w-full bg-background border border-card-border rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:border-accent-gold"
+                  className="w-full bg-background border border-card-border rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-accent-gold"
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-foreground">Mensaje / Consulta</label>
+                <label className="text-sm font-bold text-foreground">Mensaje / Consulta</label>
                 <textarea 
                   required
                   rows={4}
                   value={contactMessage}
                   onChange={(e) => setContactMessage(e.target.value)}
                   placeholder="Contanos detalladamente en qué podemos ayudarte..." 
-                  className="w-full bg-background border border-card-border rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:border-accent-gold resize-none"
+                  className="w-full bg-background border border-card-border rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-accent-gold resize-none"
                 />
               </div>
 
               <button 
                 type="submit"
-                className="w-full rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover py-3 text-xs font-extrabold text-background shadow-md hover:opacity-95 transition-all mt-2 cursor-pointer"
+                className="w-full rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover py-3 text-sm font-extrabold text-background shadow-md hover:opacity-95 transition-all mt-2 cursor-pointer"
               >
                 Enviar Consulta
               </button>
             </form>
           )}
 
-          <div className="border-t border-card-border/50 pt-4 flex flex-col gap-1.5 text-[9px] text-text-muted leading-relaxed">
+          <div className="border-t border-card-border/50 pt-4 flex flex-col gap-1.5 text-xs text-text-muted leading-relaxed">
             <p>📍 Santa Rosa, La Pampa, Argentina</p>
             <p>✉️ soporte@compraventaonline.com.ar</p>
           </div>
