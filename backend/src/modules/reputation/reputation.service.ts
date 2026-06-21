@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { SellerTier } from '@prisma/client';
+import { SellerTier, RewardType } from '@prisma/client';
+import { RewardsService } from '../rewards/rewards.service';
 
 @Injectable()
 export class ReputationService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private rewardsService: RewardsService,
+  ) {}
 
   async adjustScore(sellerId: string, points: number) {
     const seller = await this.prisma.seller.findUnique({
@@ -30,13 +34,36 @@ export class ReputationService {
       newTier = SellerTier.PLATA;
     }
 
-    return this.prisma.seller.update({
+    const updatedSeller = await this.prisma.seller.update({
       where: { id: sellerId },
       data: {
         score: newScore,
         tier: newTier,
       },
     });
+
+    // Validar si hay ascenso de nivel para otorgar premios
+    const tierLevels = {
+      [SellerTier.BRONCE]: 1,
+      [SellerTier.PLATA]: 2,
+      [SellerTier.ORO]: 3,
+      [SellerTier.PREMIUM]: 4,
+    };
+
+    if (tierLevels[newTier] > tierLevels[seller.tier]) {
+      if (newTier === SellerTier.PLATA) {
+        await this.rewardsService.grantReward(sellerId, RewardType.FREE_FEATURED_HIGHLIGHT);
+        await this.rewardsService.grantReward(sellerId, RewardType.COMMISSION_DISCOUNT_5);
+      } else if (newTier === SellerTier.ORO) {
+        await this.rewardsService.grantReward(sellerId, RewardType.FREE_FEATURED_HIGHLIGHT);
+        await this.rewardsService.grantReward(sellerId, RewardType.COMMISSION_DISCOUNT_10);
+      } else if (newTier === SellerTier.PREMIUM) {
+        await this.rewardsService.grantReward(sellerId, RewardType.FREE_PREMIUM_HIGHLIGHT);
+        await this.rewardsService.grantReward(sellerId, RewardType.COMMISSION_DISCOUNT_10);
+      }
+    }
+
+    return updatedSeller;
   }
 
   async recordCompletedSale(sellerId: string) {

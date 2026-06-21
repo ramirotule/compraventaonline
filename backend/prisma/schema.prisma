@@ -3,7 +3,9 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  output     = "../../node_modules/.prisma/client"
+  engineType = "library"
 }
 
 enum SellerType {
@@ -72,6 +74,7 @@ model Seller {
   tier           SellerTier @default(BRONCE)
   createdAt      DateTime   @default(now()) @map("created_at")
   listings       Listing[]
+  rewards        SellerReward[]
 
   @@map("sellers")
 }
@@ -169,4 +172,24 @@ model Advertisement {
   endDate        DateTime @map("end_date")
 
   @@map("advertisements")
+}
+
+enum RewardType {
+  FREE_FEATURED_HIGHLIGHT
+  FREE_PREMIUM_HIGHLIGHT
+  COMMISSION_DISCOUNT_5
+  COMMISSION_DISCOUNT_10
+}
+
+model SellerReward {
+  id        String     @id @default(uuid()) @db.Uuid
+  sellerId  String     @map("seller_id") @db.Uuid
+  seller    Seller     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  type      RewardType
+  claimed   Boolean    @default(false)
+  claimedAt DateTime?  @map("claimed_at")
+  expiresAt DateTime?  @map("expires_at")
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  @@map("seller_rewards")
 }

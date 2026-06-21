@@ -44,7 +44,10 @@ export default function DashboardPage() {
   const [sellerProfile, setSellerProfile] = useState<SellerProfile | null>(null);
   const [myListings, setMyListings] = useState<Listing[]>([]);
   const [categories, setCategories] = useState<BackendCategory[]>([]);
-  const [activeTab, setActiveTab] = useState<"summary" | "publish" | "inventory">("summary");
+  const [activeTab, setActiveTab] = useState<"summary" | "publish" | "inventory" | "rewards">("summary");
+  const [rewards, setRewards] = useState<any[]>([]);
+  const [selectedRewardToClaim, setSelectedRewardToClaim] = useState<any | null>(null);
+  const [selectedListingForReward, setSelectedListingForReward] = useState<string>("");
   
   // Form states
   const [productName, setProductName] = useState("");
@@ -118,6 +121,15 @@ export default function DashboardPage() {
         if (listingsRes.ok) {
           const listingsData = await listingsRes.json();
           setMyListings(listingsData);
+        }
+
+        // 4. Fetch Rewards
+        const rewardsRes = await fetch("http://localhost:3001/api/rewards/my-rewards", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (rewardsRes.ok) {
+          const rewardsData = await rewardsRes.json();
+          setRewards(rewardsData);
         }
       } catch (err: any) {
         setErrorMsg(err.message || "Error al cargar los datos del panel.");
@@ -224,6 +236,45 @@ export default function DashboardPage() {
     }
   };
 
+  const handleClaimReward = async (rewardId: string, listingId: string) => {
+    setLoading(true);
+    setSuccessMsg("");
+    setErrorMsg("");
+    try {
+      const res = await fetch(`http://localhost:3001/api/rewards/${rewardId}/claim`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ listingId }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Error al reclamar la recompensa.");
+      }
+
+      setSuccessMsg("¡Recompensa canjeada con éxito! Tu publicación ahora está destacada.");
+      setSelectedRewardToClaim(null);
+      setSelectedListingForReward("");
+
+      // Actualizar estado local de recompensas
+      setRewards(rewards.map(r => r.id === rewardId ? { ...r, claimed: true, claimedAt: new Date().toISOString() } : r));
+
+      // Recargar publicaciones para ver el nuevo plan destacado
+      const listingsRes = await fetch(`http://localhost:3001/api/listings?seller_id=${sellerProfile?.id}`);
+      if (listingsRes.ok) {
+        const listingsData = await listingsRes.json();
+        setMyListings(listingsData);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || "Ocurrió un error al canjear la recompensa.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     router.push("/");
@@ -294,6 +345,14 @@ export default function DashboardPage() {
             >
               Inventario ({myListings.length})
             </button>
+            <button 
+              onClick={() => setActiveTab("rewards")}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                activeTab === "rewards" ? "bg-accent-gold text-background shadow-md" : "text-foreground/80 hover:text-accent-gold"
+              }`}
+            >
+              Mis Premios ({rewards.filter(r => !r.claimed).length})
+            </button>
           </div>
 
           <button 
@@ -347,6 +406,24 @@ export default function DashboardPage() {
               <h3 className="font-heading text-xs font-extrabold text-text-muted uppercase tracking-wider mb-2">Publicaciones Activas</h3>
               <span className="text-5xl font-extrabold text-foreground font-heading">{myListings.length}</span>
               <p className="text-[10px] text-text-muted mt-4">Límite disponible: {sellerProfile.type === "BUSINESS_SELLER" ? "Ilimitado" : `${5 - myListings.length} de 5 libres`}</p>
+            </div>
+
+            {/* Rewards summary card */}
+            <div className="col-span-1 md:col-span-4 rounded-2xl glass-panel p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <h4 className="text-base font-bold text-foreground flex items-center gap-2">
+                  <span>🎁</span> Premios y Beneficios del Vendedor
+                </h4>
+                <p className="text-xs text-text-muted mt-1">
+                  Tenés beneficios por tu reputación para destacar tus artículos de forma gratuita.
+                </p>
+              </div>
+              <button 
+                onClick={() => setActiveTab("rewards")}
+                className="bg-accent-gold hover:bg-accent-gold-hover text-background text-xs font-bold px-4 py-2.5 rounded-xl hover:opacity-90 shadow-md transition-all cursor-pointer whitespace-nowrap"
+              >
+                Ver mis premios ({rewards.filter(r => !r.claimed).length} disponibles)
+              </button>
             </div>
 
           </div>
@@ -541,6 +618,157 @@ export default function DashboardPage() {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+
+        {/* TAB 4: Rewards & Benefits */}
+        {activeTab === "rewards" && (
+          <div className="w-full flex flex-col gap-6">
+            <div className="rounded-2xl glass-panel p-6">
+              <h3 className="font-heading text-sm font-extrabold text-foreground uppercase tracking-wider mb-2">🎁 Mis Premios y Beneficios</h3>
+              <p className="text-xs text-text-muted">
+                Tu reputación en la provincia de La Pampa tiene valor. A medida que subas tu reputación (Score y Tier), el sistema te otorgará de forma automática beneficios comerciales exclusivos para impulsar tu negocio.
+              </p>
+            </div>
+
+            {rewards.length === 0 ? (
+              <div className="rounded-2xl glass-panel p-10 text-center flex flex-col items-center justify-center">
+                <span className="text-4xl mb-4">🌾</span>
+                <h4 className="font-bold text-foreground">Todavía no tenés premios disponibles</h4>
+                <p className="text-xs text-text-muted mt-2 max-w-md">
+                  Para obtener beneficios como destacados gratis y descuentos en comisiones, aumentá tu reputación completando ventas exitosas y respondiendo consultas de compradores.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {rewards.map((reward) => {
+                  const isClaimed = reward.claimed;
+                  const isExpired = !isClaimed && reward.expiresAt && new Date(reward.expiresAt) < new Date();
+                  
+                  let title = "Beneficio Especial";
+                  let description = "Recompensa comercial exclusiva para tu cuenta.";
+                  
+                  if (reward.type === "FREE_FEATURED_HIGHLIGHT") {
+                    title = "Destacado FEATURED Gratuito";
+                    description = "Destaca una de tus publicaciones de forma gratuita durante 30 días.";
+                  } else if (reward.type === "FREE_PREMIUM_HIGHLIGHT") {
+                    title = "Destacado PREMIUM Gratuito";
+                    description = "Posiciona tu publicación en lo más alto de los resultados y en la página principal durante 30 días.";
+                  } else if (reward.type === "COMMISSION_DISCOUNT_5") {
+                    title = "Descuento de Comisión 5%";
+                    description = "Obtén un 5% de descuento en las comisiones de venta para tu comercio.";
+                  } else if (reward.type === "COMMISSION_DISCOUNT_10") {
+                    title = "Descuento de Comisión 10%";
+                    description = "Obtén un 10% de descuento en las comisiones de venta para tu comercio.";
+                  }
+
+                  return (
+                    <div key={reward.id} className="rounded-2xl glass-panel p-6 flex flex-col justify-between gap-4 border border-card-border">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <span className="text-2xl">
+                            {reward.type.includes("HIGHLIGHT") ? "⭐" : "🎟️"}
+                          </span>
+                          <h4 className="font-heading font-bold text-base text-foreground mt-2">{title}</h4>
+                          <p className="text-xs text-text-muted mt-1">{description}</p>
+                        </div>
+                        
+                        <div>
+                          {isClaimed ? (
+                            <span className="inline-flex items-center rounded-full bg-accent-green/10 px-2 py-0.5 text-[10px] font-bold text-accent-green border border-accent-green/20">
+                              Canjeado
+                            </span>
+                          ) : isExpired ? (
+                            <span className="inline-flex items-center rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-bold text-red-500 border border-red-500/20">
+                              Expirado
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center rounded-full bg-accent-blue/10 px-2 py-0.5 text-[10px] font-bold text-accent-blue border border-accent-blue/20">
+                              Disponible
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="border-t border-card-border/50 pt-4 flex items-center justify-between text-xs text-text-muted">
+                        <span>
+                          {isClaimed 
+                            ? `Canjeado el: ${new Date(reward.claimedAt).toLocaleDateString("es-AR")}` 
+                            : `Vence el: ${new Date(reward.expiresAt).toLocaleDateString("es-AR")}`
+                          }
+                        </span>
+
+                        {!isClaimed && !isExpired && (
+                          <button
+                            onClick={() => {
+                              setSelectedRewardToClaim(reward);
+                              const eligible = myListings.filter(l => l.status === "APPROVED");
+                              if (eligible.length > 0) {
+                                setSelectedListingForReward(eligible[0].id);
+                              }
+                            }}
+                            className="bg-gradient-to-r from-accent-gold to-accent-gold-hover text-background text-xs font-extrabold px-3 py-1.5 rounded-lg shadow-sm hover:opacity-95 transition-all cursor-pointer"
+                          >
+                            Canjear
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Modal de canje */}
+            {selectedRewardToClaim && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                <div className="w-full max-w-md rounded-2xl glass-panel border border-card-border p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                  <h3 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
+                    <span>🎁</span> Canjear Recompensa
+                  </h3>
+                  <p className="text-xs text-text-muted mt-2">
+                    Aplicá un destacado gratuito a una de tus publicaciones aprobadas para aumentar tus visitas.
+                  </p>
+
+                  <div className="flex flex-col gap-4 mt-6">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-foreground">Seleccioná tu Publicación:</label>
+                      {myListings.filter(l => l.status === "APPROVED").length === 0 ? (
+                        <p className="text-xs text-red-500">
+                          No tenés publicaciones aprobadas y activas para destacar.
+                        </p>
+                      ) : (
+                        <select
+                          value={selectedListingForReward}
+                          onChange={(e) => setSelectedListingForReward(e.target.value)}
+                          className="w-full bg-background border border-card-border rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:border-accent-gold"
+                        >
+                          {myListings.filter(l => l.status === "APPROVED").map((l) => (
+                            <option key={l.id} value={l.id}>{l.product.name} (${l.price.toLocaleString("es-AR")})</option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+
+                    <div className="flex justify-end gap-3 mt-4">
+                      <button
+                        onClick={() => setSelectedRewardToClaim(null)}
+                        className="rounded-xl border border-card-border hover:bg-card-bg/20 px-4 py-2 text-xs font-bold text-foreground transition-all cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        onClick={() => handleClaimReward(selectedRewardToClaim.id, selectedListingForReward)}
+                        disabled={loading || myListings.filter(l => l.status === "APPROVED").length === 0}
+                        className="rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover px-4 py-2 text-xs font-bold text-background shadow-md hover:opacity-95 transition-all disabled:opacity-50 cursor-pointer"
+                      >
+                        {loading ? "Procesando..." : "Confirmar Canje"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

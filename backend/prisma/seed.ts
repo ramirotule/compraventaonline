@@ -1,11 +1,20 @@
+import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 
-const prisma = new PrismaClient();
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('Iniciando seed de categorías...');
 
-  // Limpiar categorías existentes
+  // Limpiar en orden de dependencia para evitar violaciones de restricciones de base de datos
+  await prisma.productReport.deleteMany({});
+  await prisma.highlightedProduct.deleteMany({});
+  await prisma.listing.deleteMany({});
+  await prisma.product.deleteMany({});
   await prisma.category.deleteMany({});
 
   const categoriesData = [
@@ -169,4 +178,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

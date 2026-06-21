@@ -14,6 +14,13 @@
     "build:backend": "npm run build -w backend"
   },
   "devDependencies": {
+    "@types/pg": "^8.20.0",
     "concurrently": "^10.0.3"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.2.0",
+    "pg": "^8.22.0",
+    "prisma": "^7.2.0"
   }
 }
