@@ -52,12 +52,12 @@ export default function HeroCarousel() {
   return (
     <div className="relative w-full">
       <div
-        className="relative h-[200px] sm:h-[240px] md:h-[280px] w-full overflow-hidden"
+        className="relative h-[260px] sm:h-[340px] md:h-[400px] w-full overflow-hidden"
         style={{
           WebkitMaskImage:
-            "linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%)",
+            "linear-gradient(to bottom, #000 0%, #000 80%, transparent 100%)",
           maskImage:
-            "linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%)",
+            "linear-gradient(to bottom, #000 0%, #000 80%, transparent 100%)",
         }}
       >
         {SLIDES.map((slide, index) => (
