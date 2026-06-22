@@ -10,12 +10,16 @@ export class CreateListingDto {
   @IsNotEmpty({ message: 'El precio es requerido' })
   price: number;
 
+  @IsUUID('4', { message: 'El currencyId debe ser un UUID válido' })
+  @IsOptional()
+  currencyId?: string;
+
   @IsEnum(Condition, { message: 'La condición debe ser NEW o USED' })
   @IsNotEmpty({ message: 'La condición es requerida' })
   condition: Condition;
 
   @IsInt({ message: 'El stock debe ser un número entero' })
-  @Min(0, { message: 'El stock mínimo es 0' })
+  @Min(1, { message: 'El stock mínimo es 1' })
   @IsNotEmpty({ message: 'El stock es requerido' })
   stock: number;
 

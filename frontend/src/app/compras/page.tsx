@@ -122,7 +122,7 @@ export default function PurchasesPage() {
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${
                 activeTab === tab.id
-                  ? "bg-accent-gold text-background shadow-sm"
+                  ? "bg-accent-blue text-background shadow-sm"
                   : "text-text-muted hover:text-foreground"
               }`}
             >

@@ -102,7 +102,7 @@ export default function SupportPage() {
                 }}
                 className={`px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                   activeTab === tab.id 
-                    ? "bg-accent-gold text-background shadow-md" 
+                    ? "bg-accent-blue text-background shadow-md" 
                     : "text-foreground/80 hover:bg-card-border/30"
                 }`}
               >

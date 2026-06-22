@@ -1,6 +1,7 @@
 import Link from "next/link";
 import CategorySearchDropdown from "../../components/CategorySearchDropdown";
 import CustomDropdown from "../../components/CustomDropdown";
+import FavoriteButton from "../../components/FavoriteButton";
 
 interface MockListing {
   id: string;
@@ -284,6 +285,7 @@ export default async function SearchPage({
                       💎 PREMIUM
                     </span>
                   )}
+                  <FavoriteButton listingId={listing.id} />
                   <div className="h-44 w-full bg-slate-950 overflow-hidden relative">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
@@ -310,7 +312,7 @@ export default async function SearchPage({
                     <div className="flex items-baseline gap-1 mt-auto">
                       <span className="text-xs font-semibold text-accent-gold">$</span>
                       <span className="text-lg font-extrabold text-foreground">
-                        {listing.price.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
+                        {Number(listing.price).toLocaleString("es-AR")}
                       </span>
                     </div>
 

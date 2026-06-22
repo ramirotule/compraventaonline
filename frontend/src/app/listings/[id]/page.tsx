@@ -25,6 +25,11 @@ interface Listing {
     tier: string;
     type: string;
   };
+  currency?: {
+    code: string;
+    symbol: string;
+    name: string;
+  };
 }
 
 const mockListings: Record<string, Listing> = {
@@ -158,11 +163,24 @@ export default function ListingDetailPage() {
   const [contactMsg, setContactMsg] = useState("Hola! Estoy interesado en tu publicación. ¿Sigue disponible?");
   const [contactSuccess, setContactSuccess] = useState(false);
   
+  // Questions list state
+  const [questions, setQuestions] = useState<any[]>([]);
+  
   // Report Form States
   const [reportReason, setReportReason] = useState("FRAUD");
   const [reportDetails, setReportDetails] = useState("");
   const [reportSuccess, setReportSuccess] = useState(false);
   const [reportError, setReportError] = useState("");
+
+  // Cart integration
+  const [addedToCart, setAddedToCart] = useState(false);
+
+  // Favorites Integration
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [loadingFavorite, setLoadingFavorite] = useState(false);
+
+  // Active main image
+  const [activeImage, setActiveImage] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchListing() {
@@ -171,36 +189,180 @@ export default function ListingDetailPage() {
         if (res.ok) {
           const data = await res.json();
           setListing(data);
+          if (data.product?.images?.[0]) {
+            setActiveImage(data.product.images[0]);
+          }
         } else {
           // Fallback dynamic mapping
-          if (mockListings[id]) {
-            setListing(mockListings[id]);
-          } else {
-            // Find in case it's a random id or check values
-            setListing(mockListings.l1);
+          const fallback = mockListings[id] || mockListings.l1;
+          setListing(fallback);
+          if (fallback.product?.images?.[0]) {
+            setActiveImage(fallback.product.images[0]);
           }
         }
       } catch (err) {
-        if (mockListings[id]) {
-          setListing(mockListings[id]);
-        } else {
-          setListing(mockListings.l1);
+        const fallback = mockListings[id] || mockListings.l1;
+        setListing(fallback);
+        if (fallback.product?.images?.[0]) {
+          setActiveImage(fallback.product.images[0]);
         }
       } finally {
         setLoading(false);
       }
     }
-    if (id) fetchListing();
+    async function fetchQuestions() {
+      try {
+        const res = await fetch(`http://localhost:3001/api/questions/listing/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setQuestions(data);
+        }
+      } catch (err) {
+        console.error("Error fetching questions:", err);
+      }
+    }
+    if (id) {
+      fetchListing();
+      fetchQuestions();
+    }
   }, [id]);
 
-  const handleContactSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setContactSuccess(true);
+  // Check if listing is favorited
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token || !id) return;
+
+    async function checkFavoriteStatus() {
+      try {
+        const res = await fetch(`http://localhost:3001/api/favorites/listing/${id}/status`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setIsFavorite(data.isFavorite);
+        }
+      } catch (err) {
+        console.error("Error checking favorite status:", err);
+      }
+    }
+
+    checkFavoriteStatus();
+  }, [id]);
+
+  const handleToggleFavorite = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login?redirect=" + encodeURIComponent(`/listings/${id}`));
+      return;
+    }
+
+    try {
+      setLoadingFavorite(true);
+      if (isFavorite) {
+        // Remove from favorites
+        const res = await fetch(`http://localhost:3001/api/favorites/listing/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (res.ok) {
+          setIsFavorite(false);
+        }
+      } else {
+        // Add to favorites
+        const res = await fetch("http://localhost:3001/api/favorites", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ listingId: id }),
+        });
+        if (res.ok) {
+          setIsFavorite(true);
+        }
+      }
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
+    } finally {
+      setLoadingFavorite(false);
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (!listing) return;
+
+    const savedCart = localStorage.getItem("cart");
+    let cart: { id: string; name: string; price: number; quantity: number }[] = [];
+    if (savedCart) {
+      try {
+        cart = JSON.parse(savedCart);
+      } catch (e) {}
+    }
+
+    const existingIndex = cart.findIndex((item) => item.id === listing.id);
+    if (existingIndex > -1) {
+      cart[existingIndex].quantity += 1;
+    } else {
+      cart.push({
+        id: listing.id,
+        name: listing.product.name,
+        price: listing.price,
+        quantity: 1,
+      });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    window.dispatchEvent(new Event("cart-change"));
+
+    setAddedToCart(true);
     setTimeout(() => {
-      setContactSuccess(false);
-      setShowContactModal(false);
-      setContactName("");
-    }, 2500);
+      setAddedToCart(false);
+    }, 2000);
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const res = await fetch("http://localhost:3001/api/questions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          listingId: id,
+          question: contactMsg
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error("Error al enviar la pregunta");
+      }
+
+      setContactSuccess(true);
+      
+      // Refresh questions list
+      const qRes = await fetch(`http://localhost:3001/api/questions/listing/${id}`);
+      if (qRes.ok) {
+        const qData = await qRes.json();
+        setQuestions(qData);
+      }
+
+      setTimeout(() => {
+        setContactSuccess(false);
+        setShowContactModal(false);
+        setContactMsg("Hola! Estoy interesado en tu publicación. ¿Sigue disponible?");
+      }, 2500);
+    } catch (err) {
+      alert("Hubo un error al enviar la consulta. Por favor intentalo nuevamente.");
+    }
   };
 
   const handleReportSubmit = async (e: React.FormEvent) => {
@@ -281,7 +443,7 @@ export default function ListingDetailPage() {
   };
 
   const formattedWhatsAppUrl = `https://wa.me/5492954000000?text=${encodeURIComponent(
-    `Hola! Te contacto desde CompraVentaOnline.com.ar por el artículo "${listing.product.name}" ($${listing.price.toLocaleString("es-AR")}). Sigue disponible?`
+    `Hola! Te contacto desde CompraVentaOnline.com.ar por el artículo "${listing.product.name}" (${listing.currency?.symbol || "$"}${Number(listing.price).toLocaleString("es-AR")}). Sigue disponible?`
   )}`;
 
   return (
@@ -309,11 +471,36 @@ export default function ListingDetailPage() {
             )}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
-              src={listing.product.images[0]} 
+              src={activeImage || listing.product.images[0] || "/placeholder.png"} 
               alt={listing.product.name}
               className="rounded-2xl object-cover h-full w-full max-h-[500px] transition-transform duration-500 group-hover:scale-[1.01]"
             />
           </div>
+
+          {/* Galería de Miniaturas */}
+          {listing.product.images && listing.product.images.length > 1 && (
+            <div className="flex gap-3 overflow-x-auto pb-2 -mt-4">
+              {listing.product.images.map((img, idx) => {
+                const isSelected = activeImage ? activeImage === img : idx === 0;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImage(img)}
+                    className={`h-16 w-16 rounded-xl overflow-hidden border-2 bg-card-bg cursor-pointer transition-all hover:scale-105 active:scale-95 shrink-0 ${
+                      isSelected ? "border-accent-gold shadow-md" : "border-card-border hover:border-accent-gold/40"
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img 
+                      src={img} 
+                      alt={`${listing.product.name} miniatura ${idx + 1}`} 
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* Interactive Information Tabs */}
           <div className="rounded-2xl bg-card-bg border border-card-border p-6 shadow-md">
@@ -384,6 +571,50 @@ export default function ListingDetailPage() {
             )}
           </div>
 
+          {/* Sección de Preguntas y Respuestas */}
+          <div className="rounded-3xl bg-card-bg border border-card-border p-6 shadow-xl flex flex-col gap-6 animate-in fade-in duration-200">
+            <h3 className="font-heading text-base font-extrabold text-foreground border-b border-card-border pb-3 flex items-center gap-2">
+              <span>💬</span> Preguntas y respuestas
+            </h3>
+
+            <div className="flex flex-col gap-4">
+              {questions.length === 0 ? (
+                <p className="text-xs text-text-muted">Aún no se hicieron preguntas en esta publicación. ¡Sé el primero en consultar!</p>
+              ) : (
+                <div className="flex flex-col gap-4 max-h-[400px] overflow-y-auto pr-2">
+                  {questions.map((q) => (
+                    <div key={q.id} className="flex flex-col gap-2 text-xs border-b border-card-border/50 pb-3 last:border-b-0 last:pb-0">
+                      <div className="flex items-start justify-between gap-4">
+                        <p className="text-foreground leading-relaxed">
+                          <span className="text-text-muted font-bold block mb-1 text-[10px]">{q.buyer?.fullName || "Comprador"}:</span>
+                          {q.question}
+                        </p>
+                        <span className="text-[9px] text-text-muted shrink-0">
+                          {new Date(q.createdAt).toLocaleDateString("es-AR")}
+                        </span>
+                      </div>
+                      {q.answer ? (
+                        <div className="bg-card-bg-solid/40 border-l-2 border-accent-gold pl-3 py-2 rounded-r-xl flex flex-col gap-1 mt-1">
+                          <p className="text-text-muted leading-relaxed">
+                            <span className="text-accent-gold font-bold block text-[9.5px] uppercase tracking-wider">Respuesta del vendedor:</span>
+                            {q.answer}
+                          </p>
+                          {q.answeredAt && (
+                            <span className="text-[8px] text-text-muted/80 self-end">
+                              {new Date(q.answeredAt).toLocaleDateString("es-AR")}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-[9px] text-yellow-500/80 italic">Aún sin responder</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Local Advertising Banner (Phase 4 integration) */}
           <div className="rounded-2xl bg-gradient-to-r from-accent-gold/10 to-accent-green/10 border border-accent-gold/20 p-6 shadow-sm flex flex-col sm:flex-row items-center gap-6">
             <span className="text-3xl">🌾</span>
@@ -411,14 +642,32 @@ export default function ListingDetailPage() {
               <span>Stock: {listing.stock} unidades</span>
             </div>
 
-            <h1 className="font-heading text-2xl font-extrabold text-foreground leading-tight">
-              {listing.product.name}
-            </h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="font-heading text-2xl font-extrabold text-foreground leading-tight flex-1">
+                {listing.product.name}
+              </h1>
+              <button
+                onClick={handleToggleFavorite}
+                disabled={loadingFavorite}
+                className={`shrink-0 p-2 rounded-full border transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95 ${
+                  isFavorite 
+                    ? "bg-red-500/10 border-red-500/20 text-red-500 animate-pulse" 
+                    : "bg-card-bg border-card-border text-text-muted hover:text-red-500 hover:border-red-500/30"
+                }`}
+                title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={isFavorite ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2.5" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                </svg>
+              </button>
+            </div>
 
             <div className="flex items-baseline gap-1 mt-2">
-              <span className="text-sm font-semibold text-accent-gold">$</span>
+              <span className="text-sm font-semibold text-accent-gold">
+                {listing.currency ? listing.currency.symbol : "$"}
+              </span>
               <span className="text-3xl font-extrabold text-foreground">
-                {listing.price.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
+                {Number(listing.price).toLocaleString("es-AR")}
               </span>
             </div>
 
@@ -451,17 +700,44 @@ export default function ListingDetailPage() {
                   </a>
                 </>
               ) : (
-                <button 
-                  onClick={() => setShowCheckoutModal(true)}
-                  className="w-full rounded-xl bg-gradient-to-r from-accent-blue to-blue-600 px-6 py-4 text-xs font-extrabold text-white text-center shadow-md hover:scale-[1.01] transition-all cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <span>🛒</span> Comprar Producto
-                </button>
+                <div className="grid grid-cols-2 gap-3">
+                  <button 
+                    onClick={handleAddToCart}
+                    className={`rounded-xl px-4 py-4 text-xs font-extrabold text-center shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                      addedToCart 
+                        ? "bg-accent-green text-background border border-accent-green/30" 
+                        : "bg-gradient-to-r from-accent-gold to-accent-gold-hover text-background"
+                    }`}
+                  >
+                    {addedToCart ? (
+                      <>
+                        <span>✓</span> ¡Agregado!
+                      </>
+                    ) : (
+                      <>
+                        <span>🛒</span> Agregar al Carrito
+                      </>
+                    )}
+                  </button>
+                  <button 
+                    onClick={() => setShowCheckoutModal(true)}
+                    className="rounded-xl bg-gradient-to-r from-accent-blue to-blue-600 px-4 py-4 text-xs font-extrabold text-white text-center shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <span>⚡</span> Comprar Ahora
+                  </button>
+                </div>
               )}
 
               {/* In-app Message trigger */}
               <button 
-                onClick={() => setShowContactModal(true)}
+                onClick={() => {
+                  const token = localStorage.getItem("token");
+                  if (!token) {
+                    router.push("/login?redirect=" + encodeURIComponent(`/listings/${id}`));
+                  } else {
+                    setShowContactModal(true);
+                  }
+                }}
                 className="w-full rounded-xl bg-card-bg border border-card-border px-6 py-4 text-xs font-bold text-foreground text-center shadow-sm hover:scale-[1.01] transition-all cursor-pointer"
               >
                 Preguntar al Vendedor
@@ -510,25 +786,14 @@ export default function ListingDetailPage() {
             >
               ✕
             </button>
-            <h3 className="font-heading text-lg font-bold text-foreground mb-6">Contactar Vendedor</h3>
+            <h3 className="font-heading text-lg font-bold text-foreground mb-6">Preguntar al Vendedor</h3>
             
             {contactSuccess ? (
               <div className="bg-accent-green/10 border border-accent-green/30 rounded-xl p-4 text-xs font-medium text-accent-green text-center my-6">
-                ¡Mensaje enviado con éxito! El vendedor te responderá a la brevedad.
+                ¡Pregunta enviada con éxito! El vendedor te responderá a la brevedad.
               </div>
             ) : (
               <form onSubmit={handleContactSubmit} className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-foreground">Tu Nombre / Teléfono</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={contactName}
-                    onChange={(e) => setContactName(e.target.value)}
-                    placeholder="Ej. Ramiro Tule" 
-                    className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold"
-                  />
-                </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-bold text-foreground">Tu Consulta</label>
                   <textarea 
@@ -536,11 +801,12 @@ export default function ListingDetailPage() {
                     required
                     value={contactMsg}
                     onChange={(e) => setContactMsg(e.target.value)}
+                    placeholder="Escribí tu pregunta sobre este producto..."
                     className="w-full bg-background border border-card-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-accent-gold resize-none"
                   />
                 </div>
                 <button type="submit" className="w-full rounded-xl bg-gradient-to-r from-accent-gold to-accent-gold-hover py-4 text-xs font-extrabold text-background shadow-md hover:opacity-95 transition-all mt-2 cursor-pointer">
-                  Enviar Mensaje Directo
+                  Enviar Pregunta
                 </button>
               </form>
             )}
@@ -631,7 +897,7 @@ export default function ListingDetailPage() {
                 <span className="text-text-muted text-[10px] block">Vendedor: {listing.seller.name}</span>
               </div>
               <div className="text-right shrink-0">
-                <span className="font-extrabold text-foreground">${listing.price.toLocaleString("es-AR")}</span>
+                <span className="font-extrabold text-foreground">{listing.currency?.symbol || "$"}{Number(listing.price).toLocaleString("es-AR")}</span>
               </div>
             </div>
 
@@ -677,7 +943,7 @@ export default function ListingDetailPage() {
               <div className="flex justify-between items-center border-t border-card-border/30 pt-4 mt-2">
                 <span className="text-xs text-text-muted">Total a Pagar:</span>
                 <span className="font-heading text-lg font-extrabold text-accent-gold">
-                  ${listing.price.toLocaleString("es-AR")}
+                  {listing.currency?.symbol || "$"}{Number(listing.price).toLocaleString("es-AR")}
                 </span>
               </div>
             </div>
@@ -703,7 +969,7 @@ export default function ListingDetailPage() {
                   Procesando pago...
                 </>
               ) : (
-                `Pagar $${listing.price.toLocaleString("es-AR")}`
+                `Pagar ${listing.currency?.symbol || "$"}${Number(listing.price).toLocaleString("es-AR")}`
               )}
             </button>
           </div>

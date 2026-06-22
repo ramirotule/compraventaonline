@@ -11,6 +11,9 @@ import { ModerationModule } from './modules/moderation/moderation.module';
 import { ReputationModule } from './modules/reputation/reputation.module';
 import { MarketingModule } from './modules/marketing/marketing.module';
 import { RewardsModule } from './modules/rewards/rewards.module';
+import { StorageModule } from './modules/storage/storage.module';
+import { QuestionsModule } from './modules/questions/questions.module';
+import { FavoritesModule } from './modules/favorites/favorites.module';
 
 @Module({
   imports: [
@@ -24,6 +27,9 @@ import { RewardsModule } from './modules/rewards/rewards.module';
     ReputationModule,
     MarketingModule,
     RewardsModule,
+    StorageModule,
+    QuestionsModule,
+    FavoritesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
