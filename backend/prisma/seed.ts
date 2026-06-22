@@ -168,7 +168,25 @@ async function main() {
     }
   }
 
-  console.log('Seed de categorías completado con éxito.');
+  console.log('Iniciando seed de monedas...');
+  await prisma.currency.deleteMany({});
+  const pesos = await prisma.currency.create({
+    data: {
+      code: 'ARS',
+      symbol: '$',
+      name: 'Pesos Argentinos',
+    },
+  });
+  const dolares = await prisma.currency.create({
+    data: {
+      code: 'USD',
+      symbol: 'US$',
+      name: 'Dólares Estadounidenses',
+    },
+  });
+  console.log(`Monedas creadas: ${pesos.code}, ${dolares.code}`);
+
+  console.log('Seed de categorías y monedas completado con éxito.');
 }
 
 main()

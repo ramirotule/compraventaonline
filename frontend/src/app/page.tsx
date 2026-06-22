@@ -1,5 +1,7 @@
 import Link from "next/link";
 import HeroCarousel from "@/components/HeroCarousel";
+import CategoriesCarousel from "@/components/CategoriesCarousel";
+import FavoriteButton from "@/components/FavoriteButton";
 
 interface MockListing {
   id: string;
@@ -113,18 +115,6 @@ async function getListings(): Promise<MockListing[]> {
 export default async function HomePage() {
   const listings = await getListings();
 
-  // Categorías fijas con iconos descriptivos para renderizar rápido
-  const categories = [
-    { name: "Tecnología", slug: "tecnologia", icon: "💻", count: "124" },
-    { name: "Hogar", slug: "hogar", icon: "🛋️", count: "89" },
-    { name: "Vehículos", slug: "vehiculos", icon: "🚗", count: "210" },
-    { name: "Campo / Agro", slug: "campo-agro", icon: "🌾", count: "450" },
-    { name: "Construcción", slug: "construccion", icon: "🧱", count: "78" },
-    { name: "Moda", slug: "moda", icon: "👕", count: "115" },
-    { name: "Servicios", slug: "servicios", icon: "🔧", count: "64" },
-    { name: "Coleccionables", slug: "coleccionables", icon: "🏺", count: "32" },
-  ];
-
   return (
     <div className="flex flex-col gap-10 pb-16">
 
@@ -161,19 +151,7 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
-          {categories.map((cat) => (
-            <Link 
-              key={cat.slug} 
-              href={`/search?category=${cat.slug}`}
-              className="flex flex-col items-center justify-center p-5 rounded-2xl glass-card text-center group"
-            >
-              <span className="text-3xl mb-3 transition-transform group-hover:scale-110">{cat.icon}</span>
-              <span className="text-xs font-bold text-foreground group-hover:text-accent-gold transition-colors">{cat.name}</span>
-              <span className="text-[10px] text-text-muted mt-1">{cat.count} publ.</span>
-            </Link>
-          ))}
-        </div>
+        <CategoriesCarousel />
       </section>
 
       {/* 3. Highlighted Listings Grid */}
@@ -195,6 +173,7 @@ export default async function HomePage() {
               href={`/listings/${listing.id}`}
               className="group flex flex-col rounded-2xl glass-card overflow-hidden relative cursor-pointer"
             >
+              <FavoriteButton listingId={listing.id} />
               {/* Badge Plan */}
               {listing.featuredPlan !== "FREE" && (
                 <span className={`absolute top-3 left-3 z-10 rounded-lg px-2 py-0.5 text-[10px] font-extrabold tracking-wider text-background shadow-md uppercase ${

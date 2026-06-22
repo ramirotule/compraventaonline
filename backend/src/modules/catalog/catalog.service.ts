@@ -20,6 +20,13 @@ export class CatalogService {
       const schema = category.attributesSchema as any;
       if (schema.required && Array.isArray(schema.required)) {
         const attrs = dto.attributes || {};
+
+        // Sincronizar brand principal del DTO con los atributos de categoría
+        if (dto.brand && !attrs.brand) {
+          attrs.brand = dto.brand;
+          dto.attributes = attrs;
+        }
+
         for (const reqField of schema.required) {
           if (attrs[reqField] === undefined || attrs[reqField] === null || attrs[reqField] === '') {
             throw new BadRequestException(

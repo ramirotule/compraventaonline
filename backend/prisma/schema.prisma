@@ -59,6 +59,8 @@ model User {
   seller           Seller?
   termsAcceptances TermsAcceptance[]
   reports          ProductReport[]
+  questions        Question[]
+  favorites        Favorite[]
 
   @@map("users")
 }
@@ -99,6 +101,11 @@ model Category {
   subCategories    Category[] @relation("CategoryToCategory")
   products         Product[]
   attributesSchema Json       @map("attributes_schema")
+  iconUrl          String?    @map("icon_url")
+  displayOrder     Int        @default(0) @map("display_order")
+  isActive         Boolean    @default(true) @map("is_active")
+  metaTitle        String?    @map("meta_title")
+  metaDescription  String?    @map("meta_description")
 
   @@map("categories")
 }
@@ -132,6 +139,10 @@ model Listing {
   createdAt    DateTime             @default(now()) @map("created_at")
   highlights   HighlightedProduct[]
   reports      ProductReport[]
+  currencyId   String?              @map("currency_id") @db.Uuid
+  currency     Currency?            @relation(fields: [currencyId], references: [id])
+  questions    Question[]
+  favorites    Favorite[]
 
   @@map("listings")
 }
@@ -192,4 +203,44 @@ model SellerReward {
   createdAt DateTime   @default(now()) @map("created_at")
 
   @@map("seller_rewards")
+}
+
+model Currency {
+  id        String    @id @default(uuid()) @db.Uuid
+  code      String    @unique
+  symbol    String
+  name      String
+  listings  Listing[]
+
+  @@map("currencies")
+}
+
+model Question {
+  id             String    @id @default(uuid()) @db.Uuid
+  listingId      String    @map("listing_id") @db.Uuid
+  listing        Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyerId        String    @map("buyer_id") @db.Uuid
+  buyer          User      @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  question       String
+  answer         String?
+  createdAt      DateTime  @default(now()) @map("created_at")
+  answeredAt     DateTime? @map("answered_at")
+  isReadBySeller Boolean   @default(false) @map("is_read_by_seller")
+  isReadByBuyer  Boolean   @default(false) @map("is_read_by_buyer")
+
+  @@map("questions")
+}
+
+model Favorite {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId   String?  @map("listing_id") @db.Uuid
+  listing     Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  cachedTitle String   @map("cached_title")
+  cachedImage String?  @map("cached_image")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, listingId])
+  @@map("favorites")
 }
